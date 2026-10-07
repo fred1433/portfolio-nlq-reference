@@ -1,0 +1,32 @@
+{
+  "recording_id": "rec-2026-10-07-r2",
+  "created_at": "2026-10-07T13:55:01Z",
+  "provider": "claude-cli",
+  "cli_version": "2.1.292 (Claude Code)",
+  "model_requested": "sonnet",
+  "flags": [
+    "-p",
+    "--output-format",
+    "json",
+    "--model",
+    "sonnet",
+    "--system-prompt",
+    "<system_prompt.txt>",
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--setting-sources",
+    "",
+    "--disable-slash-commands",
+    "--no-session-persistence"
+  ],
+  "prompt_version": "prompt-v2",
+  "prompt_sha256": "834c356e5a5573794aaa7d403632030e733c93cfe82b2cc5a9eb968d7e3f08e9",
+  "system_prompt_file": "system_prompt.txt",
+  "expected_results_in_context": false,
+  "cases_sha256": "62224a8fe057e32fc2fb4e7afade8dc623e3c9db6430c2e2c7e276f04e30f5b0",
+  "retry_rule": "retry only when the CLI exits non-zero or times out (max 3 attempts); a reply that does not parse is kept and graded as is",
+  "note": "Second recording with prompt-v2 (other-firm mentions no longer refused). Same cases, nothing cherry-picked: every case re-recorded once."
+}

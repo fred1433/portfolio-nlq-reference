@@ -16,7 +16,7 @@ public sealed record CompiledQuery(string Sql, IReadOnlyList<QueryParameter> Par
 /// </summary>
 public static class SqlCompiler
 {
-    public const string Version = "compiler-2026.10.1";
+    public const string Version = "compiler-2026.10.2";
 
     public static CompiledQuery Compile(ResolvedQuery q) => q.Measure switch
     {
@@ -97,9 +97,11 @@ WITH dim AS (
 ), agg AS (
     SELECT acct.account_id,
            SUM(pos.market_value_usd) AS total_mv_usd,
-           SUM(CASE WHEN pos.security_id IN (SELECT security_id FROM dim) THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,
+           SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,
            STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail
-    FROM acct LEFT JOIN pos ON pos.account_id = acct.account_id
+    FROM acct
+    LEFT JOIN pos ON pos.account_id = acct.account_id
+    LEFT JOIN dim ON dim.security_id = pos.security_id
     GROUP BY acct.account_id
 ), scored AS (
     SELECT acct.account_number, acct.account_name, acct.household, acct.custodian, acct.model,
@@ -163,9 +165,11 @@ WITH dim AS (
 ), per_account AS (
     SELECT acct.account_id, acct.household_id, acct.household,
            SUM(pos.market_value_usd) AS total_mv_usd,
-           SUM(CASE WHEN pos.security_id IN (SELECT security_id FROM dim) THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,
+           SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,
            STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail
-    FROM acct LEFT JOIN pos ON pos.account_id = acct.account_id
+    FROM acct
+    LEFT JOIN pos ON pos.account_id = acct.account_id
+    LEFT JOIN dim ON dim.security_id = pos.security_id
     GROUP BY acct.account_id, acct.household_id, acct.household
 ), hh AS (
     SELECT pa.household,

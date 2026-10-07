@@ -1,0 +1,35 @@
+name: ci
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: verify (no database)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - run: make verify
+
+  sql:
+    name: sql (SQL Server 2022, Linux x86-64)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - run: make sql
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sql-run
+          path: runs/local-latest

@@ -1,7 +1,7 @@
 {
   "fixture_sha256": "9cf1bbc394e975239f14a15bbca62189bb98c2a2d01da7876e2a5336d0e5aae0",
-  "cases_sha256": "62224a8fe057e32fc2fb4e7afade8dc623e3c9db6430c2e2c7e276f04e30f5b0",
-  "computed_at": "2026-10-07T13:51:44Z",
+  "cases_sha256": "ee66c8dcb32b8e5423ce87de1d096c53ae44ab67dcfbec0b6cd7b3696c7a7c27",
+  "computed_at": "2026-10-07T13:57:29Z",
   "generator": "PortfolioNlq.Reference (LINQ over fixture/*.csv; does not use the views, the catalog or the compiler)",
   "comparison_rule": "numbers compared after rounding both sides to 10 decimal places, half away from zero; display rounds to 2",
   "cases": [

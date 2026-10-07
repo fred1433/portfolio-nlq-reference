@@ -44,7 +44,8 @@ public class SecurityTests
         await using var c = new SqlConnection(Db.Reader);
         await c.OpenAsync();
         var e = await Assert.ThrowsAsync<SqlException>(() => Strings(c, "SELECT account_number FROM rpt.v_accounts"));
-        Assert.Contains("tenant scope missing", e.Message);
+        // Raised by sec.fn_tenant_predicate. SQL Server masks the literal in the message ("***"), so check the error number.
+        Assert.Equal(245, e.Number);
     }
 
     [SqlFact]

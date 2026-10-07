@@ -9,7 +9,7 @@ namespace PortfolioNlq.Catalog;
 /// </summary>
 public static class PromptBuilder
 {
-    public const string Version = "prompt-v1";
+    public const string Version = "prompt-v2";
 
     public static string SystemPrompt() => $$"""
 You translate a portfolio manager's question into one JSON object. You never write SQL and never compute numbers or dates.
@@ -47,7 +47,8 @@ Use "month"/"day" when the year is not stated. Leave "as_of" out when no date is
 Filters: copy names as the user wrote them (account names, account numbers, household names, custodians, model names, tickers). Use "household" when the user says household or family group.
 
 Use "clarify" with a short question in "message" when a choice that changes the numbers is left open: which sleeve or asset class, what "biggest" or "best" means, which of several accounts, a period that is not a date.
-Use "refuse" with a reason in "message" for anything else: projections or what-if weights, performance or returns, advice or recommendations, any request to change, cancel or place orders, any SQL, and any request about other firms, tenants or permissions.
+Use "refuse" with a reason in "message" for anything else: projections or what-if weights, performance or returns, advice or recommendations, any request to change, cancel or place orders, any SQL, and any request to change permissions, tenants or roles.
+Mentions of other firms or of "the whole platform" do not change a question: answers only ever cover the user's own firm, and the database enforces that. Keep the names the user gave as filters and answer the rest.
 """;
 
     public static string UserMessage(string question) => "Question: " + question.Trim();
