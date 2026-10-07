@@ -1,0 +1,254 @@
+{
+  "run_id": "ci-2-x86-64",
+  "case_id": "A04",
+  "question": "Which accounts are more than 1 point above their Technology target as of Oct 6?",
+  "outcome": "answered",
+  "outcome_message": null,
+  "outcome_source": "validator",
+  "tenant_id": 1,
+  "user_id": "demo-user-tenant-1",
+  "scope": "tenant 1, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r2",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T13:55:13Z",
+    "model_duration_ms": 3543,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v2",
+    "prompt_sha256": "834c356e5a5573794aaa7d403632030e733c93cfe82b2cc5a9eb968d7e3f08e9",
+    "user_message": "Question: Which accounts are more than 1 point above their Technology target as of Oct 6?",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"drift\",\"dimension\":{\"type\":\"tag\",\"value\":\"Technology\"},\"threshold\":{\"direction\":\"above\",\"points\":1},\"group_by\":[\"account\"],\"as_of\":{\"month\":10,\"day\":6}}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "drift",
+    "dimension": {
+      "type": "tag",
+      "value": "Technology"
+    },
+    "threshold": {
+      "direction": "above",
+      "points": 1
+    },
+    "group_by": [
+      "account"
+    ],
+    "date_basis": null,
+    "as_of": {
+      "date": null,
+      "month": 10,
+      "day": 6,
+      "relative": null
+    },
+    "side": null,
+    "asset_class": null,
+    "status": null,
+    "filters": null,
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": {
+    "measure": "drift",
+    "dimension_type": "tag",
+    "dimension_value": "Technology",
+    "threshold_direction": "above",
+    "threshold_points": 1,
+    "group_by": [
+      "account"
+    ],
+    "date_basis": "trade",
+    "as_of": "2026-10-06",
+    "as_of_time": "2026-10-06T23:59:59",
+    "side": null,
+    "asset_class": null,
+    "status": "n/a",
+    "filters": [],
+    "defaults_applied": [
+      "reporting currency USD",
+      "time zone America/Chicago",
+      "trade-date positions"
+    ],
+    "definition": "Weight = market value of the sleeve's positions / market value of the whole account, cash included, in USD at the as-of close. Target = the account model's weight for the sleeve, multiplied down the model hierarchy. Drift = weight minus target, in percentage points. An account with any position lacking a close price or an FX rate on the as-of date is reported as incomplete, never valued at zero."
+  },
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 1",
+  "versions": {
+    "catalog": "catalog-2026.10.1",
+    "compiler": "compiler-2026.10.2",
+    "schema": "schema-e8a3fe80c712",
+    "prompt": "prompt-v2 sha256 834c356e5a55",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-9cf1bbc394e9",
+    "sha256": "9cf1bbc394e975239f14a15bbca62189bb98c2a2d01da7876e2a5336d0e5aae0"
+  },
+  "sql": "WITH dim AS (\n    SELECT t.security_id FROM rpt.v_security_tags AS t WHERE t.tag = @dimension_value\n), acct AS (\n    SELECT a.account_id, a.account_number, a.account_name, a.household, a.custodian, a.model\n    FROM rpt.v_accounts AS a\n    WHERE 1 = 1\n), pos AS (\n    SELECT p.account_id, p.security_id, p.market_value_usd, p.missing_reason\n    FROM rpt.fn_positions(@as_of, @basis) AS p\n), tgt AS (\n    SELECT t.account_id, SUM(t.target_weight) AS target_weight\n    FROM rpt.fn_account_targets() AS t\n    WHERE t.security_id IN (SELECT security_id FROM dim)\n    GROUP BY t.account_id\n), agg AS (\n    SELECT acct.account_id,\n           SUM(pos.market_value_usd) AS total_mv_usd,\n           SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,\n           STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail\n    FROM acct\n    LEFT JOIN pos ON pos.account_id = acct.account_id\n    LEFT JOIN dim ON dim.security_id = pos.security_id\n    GROUP BY acct.account_id\n), scored AS (\n    SELECT acct.account_number, acct.account_name, acct.household, acct.custodian, acct.model,\n           agg.total_mv_usd, agg.missing_detail,\n           CASE WHEN agg.missing_detail IS NULL\n                THEN CAST(agg.dim_mv_usd AS decimal(20,6)) * 100 / CAST(agg.total_mv_usd AS decimal(20,6)) END AS weight_pct,\n           CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct\n    FROM acct\n    JOIN agg ON agg.account_id = acct.account_id\n    LEFT JOIN tgt ON tgt.account_id = acct.account_id\n)\nSELECT account_number, account_name, household, custodian, model,\n       CASE WHEN missing_detail IS NULL THEN total_mv_usd END AS total_mv_usd,\n       weight_pct, target_pct, weight_pct - target_pct AS drift_pts,\n       CASE WHEN missing_detail IS NULL THEN 'Complete' ELSE 'Incomplete' END AS row_status,\n       missing_detail\nFROM scored\nWHERE missing_detail IS NOT NULL OR weight_pct - target_pct > @threshold_points\nORDER BY CASE WHEN missing_detail IS NULL THEN 0 ELSE 1 END, weight_pct - target_pct DESC, account_number;",
+  "detail_sql": "WITH dim AS (\n    SELECT t.security_id FROM rpt.v_security_tags AS t WHERE t.tag = @dimension_value\n), acct AS (\n    SELECT a.account_id, a.account_number, a.account_name, a.household, a.custodian, a.model\n    FROM rpt.v_accounts AS a\n    WHERE 1 = 1\n), pos AS (\n    SELECT p.account_id, p.security_id, p.market_value_usd, p.missing_reason\n    FROM rpt.fn_positions(@as_of, @basis) AS p\n), tot AS (\n    SELECT pos.account_id, SUM(pos.market_value_usd) AS total_mv_usd FROM pos GROUP BY pos.account_id\n), tgt AS (\n    SELECT t.account_id, t.security_id, t.target_weight FROM rpt.fn_account_targets() AS t\n)\nSELECT acct.account_number, p.symbol, p.security_name, p.quantity, p.currency, p.close_price, p.usd_per_unit,\n       p.market_value_usd,\n       CAST(p.market_value_usd AS decimal(20,6)) * 100 / CAST(tot.total_mv_usd AS decimal(20,6)) AS contribution_pct,\n       CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct,\n       p.missing_reason\nFROM acct\nJOIN rpt.fn_positions(@as_of, @basis) AS p ON p.account_id = acct.account_id\nJOIN tot ON tot.account_id = acct.account_id\nLEFT JOIN tgt ON tgt.account_id = acct.account_id AND tgt.security_id = p.security_id\nWHERE p.security_id IN (SELECT security_id FROM dim)\nORDER BY acct.account_number, p.market_value_usd DESC, p.symbol;",
+  "parameters": [
+    {
+      "name": "@as_of",
+      "sql_type": "date",
+      "value": "2026-10-06"
+    },
+    {
+      "name": "@basis",
+      "sql_type": "varchar(10)",
+      "value": "trade"
+    },
+    {
+      "name": "@dimension_value",
+      "sql_type": "nvarchar(60)",
+      "value": "Technology"
+    },
+    {
+      "name": "@threshold_points",
+      "sql_type": "decimal(9,4)",
+      "value": "1"
+    }
+  ],
+  "key_columns": [
+    "account_number"
+  ],
+  "execution_status": "complete",
+  "execution_note": "1 row(s), complete.",
+  "columns": [
+    "account_number",
+    "account_name",
+    "household",
+    "custodian",
+    "model",
+    "total_mv_usd",
+    "weight_pct",
+    "target_pct",
+    "drift_pts",
+    "row_status",
+    "missing_detail"
+  ],
+  "rows": [
+    {
+      "account_number": "LWP-1005",
+      "account_name": "Brennan Revocable Trust",
+      "household": "Brennan Family",
+      "custodian": "Pershing",
+      "model": "Balanced 60/40",
+      "total_mv_usd": "3264032",
+      "weight_pct": "5.63131734002607",
+      "target_pct": "3",
+      "drift_pts": "2.63131734002607",
+      "row_status": "Complete",
+      "missing_detail": null
+    }
+  ],
+  "detail_rows": [
+    {
+      "account_number": "LWP-1001",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "2900",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "416440",
+      "contribution_pct": "4.79689701444304",
+      "target_pct": "4",
+      "missing_reason": null
+    },
+    {
+      "account_number": "LWP-1002",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "450",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "64620",
+      "contribution_pct": "2.76202948900317",
+      "target_pct": "3",
+      "missing_reason": null
+    },
+    {
+      "account_number": "LWP-1003",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "1600",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "229760",
+      "contribution_pct": "3.66666070876857",
+      "target_pct": "4",
+      "missing_reason": null
+    },
+    {
+      "account_number": "LWP-1004",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "295",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "42362",
+      "contribution_pct": "2.91087748230605",
+      "target_pct": "3",
+      "missing_reason": null
+    },
+    {
+      "account_number": "LWP-1005",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "1280",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "183808",
+      "contribution_pct": "5.63131734002607",
+      "target_pct": "3",
+      "missing_reason": null
+    },
+    {
+      "account_number": "LWP-1006",
+      "symbol": "ACMR",
+      "security_name": "Acme Robotics Inc.",
+      "quantity": "340",
+      "currency": "USD",
+      "close_price": "143.6",
+      "usd_per_unit": "1",
+      "market_value_usd": "48824",
+      "contribution_pct": "2.11567936241404",
+      "target_pct": "4",
+      "missing_reason": null
+    }
+  ],
+  "durations_ms": {
+    "model": 3543,
+    "parse": 0,
+    "validate": 5,
+    "compile": 0,
+    "execute": 9
+  },
+  "executed_at": "2026-10-07T14:02:29Z",
+  "executed_on": "Ubuntu 24.04.5 LTS X64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

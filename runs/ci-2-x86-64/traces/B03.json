@@ -1,0 +1,189 @@
+{
+  "run_id": "ci-2-x86-64",
+  "case_id": "B03",
+  "question": "Show all sell allocations for the Whitfield household today, including filled and cancelled ones, by account and custodian.",
+  "outcome": "answered",
+  "outcome_message": null,
+  "outcome_source": "validator",
+  "tenant_id": 1,
+  "user_id": "demo-user-tenant-1",
+  "scope": "tenant 1, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r2",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T13:55:45Z",
+    "model_duration_ms": 4639,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v2",
+    "prompt_sha256": "834c356e5a5573794aaa7d403632030e733c93cfe82b2cc5a9eb968d7e3f08e9",
+    "user_message": "Question: Show all sell allocations for the Whitfield household today, including filled and cancelled ones, by account and custodian.",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"side\":\"sell\",\"status\":\"all\",\"group_by\":[\"account\",\"custodian\"],\"as_of\":{\"relative\":\"today\"},\"filters\":[{\"field\":\"household\",\"value\":\"Whitfield\"}]}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "open_allocations",
+    "dimension": null,
+    "threshold": null,
+    "group_by": [
+      "account",
+      "custodian"
+    ],
+    "date_basis": null,
+    "as_of": {
+      "date": null,
+      "month": null,
+      "day": null,
+      "relative": "today"
+    },
+    "side": "sell",
+    "asset_class": null,
+    "status": "all",
+    "filters": [
+      {
+        "field": "household",
+        "value": "Whitfield"
+      }
+    ],
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": {
+    "measure": "open_allocations",
+    "dimension_type": null,
+    "dimension_value": null,
+    "threshold_direction": null,
+    "threshold_points": null,
+    "group_by": [
+      "account",
+      "custodian"
+    ],
+    "date_basis": "n/a",
+    "as_of": "2026-10-07",
+    "as_of_time": "2026-10-07T23:59:59",
+    "side": "Sell",
+    "asset_class": null,
+    "status": "all",
+    "filters": [
+      {
+        "field": "household",
+        "input": "Whitfield",
+        "ids": [
+          1
+        ],
+        "matched": [
+          "Whitfield Family"
+        ]
+      }
+    ],
+    "defaults_applied": [
+      "reporting currency USD",
+      "time zone America/Chicago"
+    ],
+    "definition": "Per allocation of a block order: allocated quantity, executed quantity (sum of fills up to the as-of time), cancelled quantity, remaining = allocated - executed - cancelled. Open means remaining above zero. Quantities in shares or units; no prices involved."
+  },
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 1",
+  "versions": {
+    "catalog": "catalog-2026.10.1",
+    "compiler": "compiler-2026.10.2",
+    "schema": "schema-e8a3fe80c712",
+    "prompt": "prompt-v2 sha256 834c356e5a55",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-9cf1bbc394e9",
+    "sha256": "9cf1bbc394e975239f14a15bbca62189bb98c2a2d01da7876e2a5336d0e5aae0"
+  },
+  "sql": "WITH ex AS (\n    SELECT e.allocation_id, SUM(e.quantity) AS executed_qty\n    FROM rpt.v_executions AS e\n    WHERE e.executed_at <= @as_of_time\n    GROUP BY e.allocation_id\n), lines AS (\n    SELECT l.allocation_id, l.block_id, l.side, l.symbol, l.security_name, l.account_number, l.account_name, l.custodian,\n           l.allocated_quantity,\n           COALESCE(ex.executed_qty, 0) AS executed_qty,\n           CASE WHEN l.cancelled_at <= @as_of_time THEN l.cancelled_quantity ELSE 0 END AS cancelled_qty\n    FROM rpt.v_allocation_lines AS l\n    LEFT JOIN ex ON ex.allocation_id = l.allocation_id\n    WHERE l.created_at <= @as_of_time\n      AND l.side = @side\n      AND l.household_id IN (@household_0)\n), scored AS (\n    SELECT lines.*,\n           allocated_quantity - executed_qty - cancelled_qty AS remaining_qty,\n           CASE WHEN allocated_quantity - executed_qty - cancelled_qty > 0\n                THEN CASE WHEN executed_qty > 0 THEN N'Partially filled' ELSE N'Working' END\n                WHEN cancelled_qty > 0 THEN N'Remainder cancelled'\n                ELSE N'Filled' END AS line_status\n    FROM lines\n)\nSELECT account_number, account_name, custodian,\n       SUM(allocated_quantity) AS allocated_qty,\n       SUM(executed_qty) AS executed_qty,\n       SUM(cancelled_qty) AS cancelled_qty,\n       SUM(remaining_qty) AS remaining_qty,\n       CASE WHEN MIN(line_status) = MAX(line_status) THEN MIN(line_status) ELSE N'Mixed' END AS order_status,\n       COUNT(*) AS allocation_count\nFROM scored\nWHERE 1 = 1\nGROUP BY account_number, account_name, custodian\nORDER BY account_number, account_name, custodian;",
+  "detail_sql": null,
+  "parameters": [
+    {
+      "name": "@as_of_time",
+      "sql_type": "datetime2(0)",
+      "value": "2026-10-07T23:59:59"
+    },
+    {
+      "name": "@side",
+      "sql_type": "varchar(4)",
+      "value": "Sell"
+    },
+    {
+      "name": "@household_0",
+      "sql_type": "int",
+      "value": "1"
+    }
+  ],
+  "key_columns": [
+    "account_number",
+    "custodian"
+  ],
+  "execution_status": "complete",
+  "execution_note": "2 row(s), complete.",
+  "columns": [
+    "account_number",
+    "account_name",
+    "custodian",
+    "allocated_qty",
+    "executed_qty",
+    "cancelled_qty",
+    "remaining_qty",
+    "order_status",
+    "allocation_count"
+  ],
+  "rows": [
+    {
+      "account_number": "LWP-1001",
+      "account_name": "Whitfield Family Trust",
+      "custodian": "Schwab",
+      "allocated_qty": "620",
+      "executed_qty": "350",
+      "cancelled_qty": "0",
+      "remaining_qty": "270",
+      "order_status": "Mixed",
+      "allocation_count": "2"
+    },
+    {
+      "account_number": "LWP-1002",
+      "account_name": "Whitfield IRA",
+      "custodian": "Fidelity",
+      "allocated_qty": "250",
+      "executed_qty": "100",
+      "cancelled_qty": "150",
+      "remaining_qty": "0",
+      "order_status": "Remainder cancelled",
+      "allocation_count": "1"
+    }
+  ],
+  "detail_rows": [],
+  "durations_ms": {
+    "model": 4639,
+    "parse": 0,
+    "validate": 6,
+    "compile": 0,
+    "execute": 18
+  },
+  "executed_at": "2026-10-07T14:02:29Z",
+  "executed_on": "Ubuntu 24.04.5 LTS X64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

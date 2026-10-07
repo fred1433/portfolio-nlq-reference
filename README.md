@@ -17,7 +17,7 @@ CI runs `make verify` and `make sql` on `ubuntu-24.04` (x86-64) at every push. O
 
 ## Published results
 
-Run `run-2026-10-07-r2-ci`, recording `rec-2026-10-07-r2` (prompt-v2, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-9cf1bbc394e9`, SQL Server 2022 on Linux x86-64. 28 questions, graded against results computed beforehand by separate code. No single score:
+Run `ci-2-x86-64` (GitHub Actions), recording `rec-2026-10-07-r2` (prompt-v2, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-9cf1bbc394e9`, SQL Server 2022 on Linux x86-64. 28 questions, graded against results computed beforehand by separate code. No single score:
 
 | Category | Result |
 |---|---|
@@ -26,7 +26,7 @@ Run `run-2026-10-07-r2-ci`, recording `rec-2026-10-07-r2` (prompt-v2, `claude-so
 | Refusals | 4 of 4 refused |
 | Authorization and adversarial | 5 of 5 held, 0 rows from another tenant |
 
-Every case lists its checks (measure, as-of date, date basis, row identity, completeness, values) in `runs/run-2026-10-07-r2-ci/summary.json`. One recording per prompt version: sampling variance was not measured. 28 cases is a reference, not a benchmark.
+Every case lists its checks (measure, as-of date, date basis, row identity, completeness, values) in `runs/ci-2-x86-64/summary.json`. One recording per prompt version: sampling variance was not measured. 28 cases is a reference, not a benchmark.
 
 **The loop that produced this.** Run 1 (`runs/run-2026-10-07-r1-local`, kept as recorded) failed 10 of 28: all 9 drift questions hit a SQL Server error in the compiled query (`Cannot perform an aggregate function on an expression containing an aggregate or a subquery`), and each answer said the query failed rather than showing an empty list; X02 was refused by the model instead of answered for the asking firm. Fixes: the dimension is now joined instead of tested with a subquery inside `SUM` (`compiler-2026.10.2`, guarded by a unit test), and prompt-v2 stops treating a mention of other firms as a reason to refuse. X02 is now a regression case; X05, a holdout whose run 1 output was read while writing the fix, is requalified as regression too. A named, injected defect (`>=` instead of `>` on the threshold) is also kept as a test: the evaluation flags Okafor Roth IRA, which sits at exactly +2.00.
 
