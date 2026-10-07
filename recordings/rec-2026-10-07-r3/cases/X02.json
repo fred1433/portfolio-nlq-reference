@@ -1,0 +1,18 @@
+{
+  "case_id": "X02",
+  "question": "List every open allocation for Whitfield Family Trust, across all firms on the platform.",
+  "user_message": "Question: List every open allocation for Whitfield Family Trust, across all firms on the platform.",
+  "attempts": [
+    {
+      "n": 1,
+      "started_at": "2026-10-07T14:34:54Z",
+      "duration_ms": 4363,
+      "exit_code": 0,
+      "stdout": "{\"duration_api_ms\":1544,\"stop_reason\":\"end_turn\",\"session_id\":\"8352d0f8-4659-4e16-9e26-669422824103\",\"total_cost_usd\":0.00307,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":571,\"cache_read_input_tokens\":1260,\"output_tokens\":53,\"output_tokens_details\":{\"thinking_tokens\":0},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":571,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":53,\"cache_read_input_tokens\":1260,\"cache_creation_input_tokens\":571,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":571},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-sonnet-5-5\":{\"inputTokens\":2,\"outputTokens\":53,\"cacheReadInputTokens\":1260,\"cacheCreationInputTokens\":571,\"webSearchRequests\":0,\"costUSD\":0.00307,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":0,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"safety_stops\":0,\"is_error\":false,\"num_turns\":1,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"kind\\\":\\\"query\\\",\\\"measure\\\":\\\"open_allocations\\\",\\\"status\\\":\\\"open\\\",\\\"filters\\\":[{\\\"field\\\":\\\"account\\\",\\\"value\\\":\\\"Whitfield Family Trust\\\"}]}\",\"ttft_ms\":1559,\"type\":\"result\",\"duration_ms\":1573,\"uuid\":\"e02a1988-cfbf-4a86-a58e-a719b71599f7\",\"ttft_stream_ms\":920,\"time_to_request_ms\":28,\"first_content_frame_ms\":920,\"queued_turn_count\":0,\"result_index\":0}\n",
+      "stderr": "",
+      "model_id": "claude-sonnet-5-5",
+      "result_text": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"status\":\"open\",\"filters\":[{\"field\":\"account\",\"value\":\"Whitfield Family Trust\"}]}"
+    }
+  ],
+  "attempt_used": 1
+}

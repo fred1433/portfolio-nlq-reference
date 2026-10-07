@@ -1,0 +1,32 @@
+{
+  "recording_id": "rec-2026-10-07-r3",
+  "created_at": "2026-10-07T14:33:29Z",
+  "provider": "claude-cli",
+  "cli_version": "2.1.292 (Claude Code)",
+  "model_requested": "sonnet",
+  "flags": [
+    "-p",
+    "--output-format",
+    "json",
+    "--model",
+    "sonnet",
+    "--system-prompt",
+    "<system_prompt.txt>",
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--setting-sources",
+    "",
+    "--disable-slash-commands",
+    "--no-session-persistence"
+  ],
+  "prompt_version": "prompt-v2",
+  "prompt_sha256": "d2cb0a551c0fa713b26f41d0d3da311d848e3910dfbe6ba4a5fb4f69c6eee30a",
+  "system_prompt_file": "system_prompt.txt",
+  "expected_results_in_context": false,
+  "cases_sha256": "0d2fe11c93758471a7c3d0259f273cd9667953715fbeb28094f8932712ed3905",
+  "retry_rule": "retry only when the CLI exits non-zero or times out (max 3 attempts); a reply that does not parse is kept and graded as is",
+  "note": "Third recording, prompt-v2 unchanged. Made after the fixture correction of 7 October (euro issuer, T+2, Chicago session times); expected results were recomputed and committed before these calls."
+}

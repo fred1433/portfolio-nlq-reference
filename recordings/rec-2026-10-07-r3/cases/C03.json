@@ -1,0 +1,18 @@
+{
+  "case_id": "C03",
+  "question": "Which accounts were more than 2 points above their equity target at the end of last month?",
+  "user_message": "Question: Which accounts were more than 2 points above their equity target at the end of last month?",
+  "attempts": [
+    {
+      "n": 1,
+      "started_at": "2026-10-07T14:34:28Z",
+      "duration_ms": 3169,
+      "exit_code": 0,
+      "stdout": "{\"duration_api_ms\":1511,\"stop_reason\":\"end_turn\",\"session_id\":\"e9323582-9f70-4109-bb39-f8a324ea04ee\",\"total_cost_usd\":0.003378,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":568,\"cache_read_input_tokens\":1260,\"output_tokens\":85,\"output_tokens_details\":{\"thinking_tokens\":0},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":568,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":85,\"cache_read_input_tokens\":1260,\"cache_creation_input_tokens\":568,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":568},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-sonnet-5-5\":{\"inputTokens\":2,\"outputTokens\":85,\"cacheReadInputTokens\":1260,\"cacheCreationInputTokens\":568,\"webSearchRequests\":0,\"costUSD\":0.003378,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":0,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"safety_stops\":0,\"is_error\":false,\"num_turns\":1,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"kind\\\":\\\"query\\\",\\\"measure\\\":\\\"drift\\\",\\\"dimension\\\":{\\\"type\\\":\\\"asset_class\\\",\\\"value\\\":\\\"Equity\\\"},\\\"threshold\\\":{\\\"direction\\\":\\\"above\\\",\\\"points\\\":2},\\\"group_by\\\":[\\\"account\\\"],\\\"as_of\\\":{\\\"relative\\\":\\\"previous_month_end\\\"}}\",\"ttft_ms\":1519,\"type\":\"result\",\"duration_ms\":1536,\"uuid\":\"506bdebf-a855-472d-a299-9a341726cd41\",\"ttft_stream_ms\":843,\"time_to_request_ms\":24,\"first_content_frame_ms\":843,\"queued_turn_count\":0,\"result_index\":0}\n",
+      "stderr": "",
+      "model_id": "claude-sonnet-5-5",
+      "result_text": "{\"kind\":\"query\",\"measure\":\"drift\",\"dimension\":{\"type\":\"asset_class\",\"value\":\"Equity\"},\"threshold\":{\"direction\":\"above\",\"points\":2},\"group_by\":[\"account\"],\"as_of\":{\"relative\":\"previous_month_end\"}}"
+    }
+  ],
+  "attempt_used": 1
+}
