@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Independent expected results. References the fixture loader only: never the views, the compiler or the catalog under test. -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PortfolioNlq.Fixture\PortfolioNlq.Fixture.csproj" />
+  </ItemGroup>
+</Project>

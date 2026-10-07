@@ -1,0 +1,17 @@
+security_id,tag
+1,US
+1,Large Cap
+1,Core
+2,US
+2,Small Cap
+3,International
+3,Core
+4,US
+4,Technology
+4,Single Stock
+5,International
+5,Financials
+5,Single Stock
+6,Core
+7,Tax Exempt
+8,Private Credit

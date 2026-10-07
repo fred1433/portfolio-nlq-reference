@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PortfolioNlq.Fixture/PortfolioNlq.Fixture.csproj" />
+    <Project Path="src/PortfolioNlq.Reference/PortfolioNlq.Reference.csproj" />
+    <Project Path="src/PortfolioNlq.Core/PortfolioNlq.Core.csproj" />
+    <Project Path="src/PortfolioNlq.Cli/PortfolioNlq.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PortfolioNlq.Tests/PortfolioNlq.Tests.csproj" />
+    <Project Path="tests/PortfolioNlq.SqlTests/PortfolioNlq.SqlTests.csproj" />
+  </Folder>
+</Solution>

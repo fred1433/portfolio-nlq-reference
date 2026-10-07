@@ -1,0 +1,10 @@
+account_id,tenant_id,account_number,name,account_type,household_id,custodian_id,model_id,base_currency
+101,1,LWP-1001,Whitfield Family Trust,Advisory,1,1,1,USD
+102,1,LWP-1002,Whitfield IRA,Advisory,1,2,2,USD
+103,1,LWP-1003,Okafor Joint,Advisory,2,2,1,USD
+104,1,LWP-1004,Okafor Roth IRA,Advisory,2,2,2,USD
+105,1,LWP-1005,Brennan Revocable Trust,Advisory,3,3,2,USD
+106,1,LWP-1006,Delgado Individual,Advisory,4,1,1,USD
+201,2,HCC-2001,Halyard Creek Credit Fund LP,Fund,,4,5,USD
+202,2,HCC-2002,Halyard Creek Offshore Ltd,Fund,,4,5,USD
+203,2,HCC-2003,Whitfield Family Trust,Separate Account,,3,5,USD

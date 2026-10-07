@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The answering layer. No host dependency: embed it in-process in an existing .NET app or behind an internal service. -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.10.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PortfolioNlq.Fixture\PortfolioNlq.Fixture.csproj" />
+  </ItemGroup>
+</Project>

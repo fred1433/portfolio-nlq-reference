@@ -1,0 +1,681 @@
+{
+  "fixture_sha256": "9cf1bbc394e975239f14a15bbca62189bb98c2a2d01da7876e2a5336d0e5aae0",
+  "cases_sha256": "62224a8fe057e32fc2fb4e7afade8dc623e3c9db6430c2e2c7e276f04e30f5b0",
+  "computed_at": "2026-10-07T13:51:44Z",
+  "generator": "PortfolioNlq.Reference (LINQ over fixture/*.csv; does not use the views, the catalog or the compiler)",
+  "comparison_rule": "numbers compared after rounding both sides to 10 decimal places, half away from zero; display rounds to 2",
+  "cases": [
+    {
+      "case_id": "A01",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681445.50",
+            "weight_pct": "83.10850998258296962182161945",
+            "target_pct": "80.0000",
+            "drift_pts": "3.10850998258296962182161945"
+          }
+        },
+        {
+          "key": "LWP-1003",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "6266192.00",
+            "weight_pct": "82.60610271756754341392667189",
+            "target_pct": "80.0000",
+            "drift_pts": "2.60610271756754341392667189"
+          }
+        },
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "64.607745879942353506338173155",
+            "target_pct": "60.0000",
+            "drift_pts": "4.607745879942353506338173155"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A02",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681445.50",
+            "weight_pct": "83.10850998258296962182161945",
+            "target_pct": "80.0000",
+            "drift_pts": "3.10850998258296962182161945"
+          }
+        },
+        {
+          "key": "LWP-1003",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "6266192.00",
+            "weight_pct": "82.60610271756754341392667189",
+            "target_pct": "80.0000",
+            "drift_pts": "2.60610271756754341392667189"
+          }
+        },
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "64.607745879942353506338173155",
+            "target_pct": "60.0000",
+            "drift_pts": "4.607745879942353506338173155"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A03",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681465.00",
+            "weight_pct": "85.17410367950570554624133139",
+            "target_pct": "80.0000",
+            "drift_pts": "5.17410367950570554624133139"
+          }
+        },
+        {
+          "key": "LWP-1002",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "2339594.00",
+            "weight_pct": "63.338468127375946424892524088",
+            "target_pct": "60.0000",
+            "drift_pts": "3.338468127375946424892524088"
+          }
+        },
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264232.00",
+            "weight_pct": "70.192850875795592960304292097",
+            "target_pct": "60.0000",
+            "drift_pts": "10.192850875795592960304292097"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A04",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "5.6313173400260781757041597631",
+            "target_pct": "3.0000",
+            "drift_pts": "2.6313173400260781757041597631"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A05",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "household"
+      ],
+      "rows": [
+        {
+          "key": "Brennan Family",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "64.607745879942353506338173155",
+            "target_pct": "60.0000",
+            "drift_pts": "4.607745879942353506338173155"
+          }
+        },
+        {
+          "key": "Okafor Household",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "7721492.0000",
+            "weight_pct": "78.722389403498702064316067413",
+            "target_pct": "76.230521251592308843938451273",
+            "drift_pts": "2.491868151906393220377616140"
+          }
+        },
+        {
+          "key": "Whitfield Family",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "11021029.50",
+            "weight_pct": "78.446782126842143013953460518",
+            "target_pct": "75.754327669660987660000365665",
+            "drift_pts": "2.692454457181155353953094853"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A06",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681445.50",
+            "weight_pct": "15.030227397038891737556838893",
+            "target_pct": "20.0000",
+            "drift_pts": "-4.969772602961108262443161107"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A07",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8580036.00",
+            "weight_pct": "84.96887425647165116789719763",
+            "target_pct": "80.0000",
+            "drift_pts": "4.96887425647165116789719763"
+          }
+        },
+        {
+          "key": "LWP-1002",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "2320882.00",
+            "weight_pct": "62.963886143285182098874479616",
+            "target_pct": "60.0000",
+            "drift_pts": "2.963886143285182098874479616"
+          }
+        },
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3233237.00",
+            "weight_pct": "69.83638997079397520194158362",
+            "target_pct": "60.0000",
+            "drift_pts": "9.83638997079397520194158362"
+          }
+        },
+        {
+          "key": "LWP-1006",
+          "status": "Incomplete",
+          "values": {},
+          "reason": "no EUR/USD rate on 2026-10-02"
+        }
+      ]
+    },
+    {
+      "case_id": "A08",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681445.50",
+            "weight_pct": "15.030227397038891737556838893",
+            "target_pct": "20.0000",
+            "drift_pts": "-4.969772602961108262443161107"
+          }
+        },
+        {
+          "key": "LWP-1004",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "1455300.0000",
+            "weight_pct": "28.090661719233147804576376005",
+            "target_pct": "38.0000",
+            "drift_pts": "-9.909338280766852195423623995"
+          }
+        },
+        {
+          "key": "LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "30.615952907324437995705924452",
+            "target_pct": "38.0000",
+            "drift_pts": "-7.384047092675562004294075548"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "A09",
+      "tenant_id": 2,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "HCC-2001",
+          "status": "Incomplete",
+          "values": {},
+          "reason": "no close for HCXN on 2026-10-06"
+        },
+        {
+          "key": "HCC-2002",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8333608.880000",
+            "weight_pct": "28.101587364152851867461291272",
+            "target_pct": "25.0000",
+            "drift_pts": "3.101587364152851867461291272"
+          }
+        },
+        {
+          "key": "HCC-2003",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3037514.058000",
+            "weight_pct": "30.913904728338215315677067395",
+            "target_pct": "25.0000",
+            "drift_pts": "5.913904728338215315677067395"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B01",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "symbol",
+        "custodian"
+      ],
+      "rows": [
+        {
+          "key": "ACMR | Schwab",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "remaining_qty": "120",
+            "order_status": "Working",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "USLC | Schwab",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B02",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "symbol"
+      ],
+      "rows": [
+        {
+          "key": "ACMR",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "remaining_qty": "120",
+            "order_status": "Working",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "USLC",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B03",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "custodian"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001 | Schwab",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "620",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "remaining_qty": "270",
+            "order_status": "Mixed",
+            "allocation_count": "2"
+          }
+        },
+        {
+          "key": "LWP-1002 | Fidelity",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "250",
+            "executed_qty": "100",
+            "cancelled_qty": "150",
+            "remaining_qty": "0",
+            "order_status": "Remainder cancelled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B04",
+      "tenant_id": 2,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "symbol",
+        "custodian"
+      ],
+      "rows": [
+        {
+          "key": "HCC-2002 | NRDB | Northern Trust",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "remaining_qty": "500",
+            "order_status": "Working",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "HCC-2002 | USLC | Northern Trust",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "400",
+            "executed_qty": "250",
+            "cancelled_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B05",
+      "tenant_id": 2,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number"
+      ],
+      "rows": [
+        {
+          "key": "HCC-2001",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "600",
+            "executed_qty": "500",
+            "cancelled_qty": "0",
+            "remaining_qty": "100",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "HCC-2002",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "400",
+            "executed_qty": "250",
+            "cancelled_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B06",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "symbol",
+        "custodian"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1002 | USLC | Fidelity",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "250",
+            "executed_qty": "100",
+            "cancelled_qty": "150",
+            "remaining_qty": "0",
+            "order_status": "Remainder cancelled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "C01",
+      "tenant_id": 1,
+      "category": "clarification",
+      "outcome": "clarify",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "C02",
+      "tenant_id": 1,
+      "category": "clarification",
+      "outcome": "clarify",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "C03",
+      "tenant_id": 1,
+      "category": "clarification",
+      "outcome": "clarify",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "C04",
+      "tenant_id": 1,
+      "category": "clarification",
+      "outcome": "clarify",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "R01",
+      "tenant_id": 1,
+      "category": "refusal",
+      "outcome": "refuse",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "R02",
+      "tenant_id": 1,
+      "category": "refusal",
+      "outcome": "refuse",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "R03",
+      "tenant_id": 1,
+      "category": "refusal",
+      "outcome": "refuse",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "R04",
+      "tenant_id": 1,
+      "category": "refusal",
+      "outcome": "refuse",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "X01",
+      "tenant_id": 1,
+      "category": "authorization",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "symbol",
+        "custodian"
+      ],
+      "rows": []
+    },
+    {
+      "case_id": "X02",
+      "tenant_id": 1,
+      "category": "authorization",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "symbol",
+        "custodian"
+      ],
+      "rows": [
+        {
+          "key": "LWP-1001 | ACMR | Schwab",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "remaining_qty": "120",
+            "order_status": "Working",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "LWP-1001 | USLC | Schwab",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "X03",
+      "tenant_id": 1,
+      "category": "authorization",
+      "outcome": "nothing",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "X04",
+      "tenant_id": 1,
+      "category": "authorization",
+      "outcome": "nothing",
+      "key_columns": [],
+      "rows": []
+    },
+    {
+      "case_id": "X05",
+      "tenant_id": 2,
+      "category": "authorization",
+      "outcome": "nothing",
+      "key_columns": [],
+      "rows": []
+    }
+  ]
+}

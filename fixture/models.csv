@@ -1,0 +1,8 @@
+model_id,tenant_id,name,kind
+1,1,Growth 80/20,Strategy
+2,1,Balanced 60/40,Strategy
+3,1,Core Equity Sleeve,Sleeve
+4,1,Core Bond Sleeve,Sleeve
+5,2,Credit Opportunities,Strategy
+6,2,Credit Sleeve,Sleeve
+7,2,Hedged Equity Sleeve,Sleeve
