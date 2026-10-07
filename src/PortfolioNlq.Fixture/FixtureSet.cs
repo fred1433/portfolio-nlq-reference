@@ -81,7 +81,20 @@ public sealed record FixtureSet
             Transactions = tables["transactions.csv"].Select(r => new Transaction(I(r, "transaction_id"), I(r, "account_id"), I(r, "security_id"), M(r, "quantity"),
                 Dt(r, "trade_date"), Dt(r, "settle_date"), r["type"], NI(r, "execution_id"))).ToList(),
             Sha256 = ComputeSha256(directory),
-        };
+        }.CheckConventions();
+    }
+
+    /// <summary>Whole units for every security quantity; only cash balances carry decimals.</summary>
+    public FixtureSet CheckConventions()
+    {
+        static void Whole(decimal q, string what) { if (q != decimal.Truncate(q)) throw new InvalidDataException($"{what}: {q} is not a whole number of units"); }
+        bool IsCash(int securityId) => Securities.Single(x => x.SecurityId == securityId).AssetClass == "Cash";
+        foreach (var b in BlockOrders) Whole(b.OrderQuantity, $"block {b.BlockId}");
+        foreach (var a in Allocations) { Whole(a.AllocatedQuantity, $"allocation {a.AllocationId}"); Whole(a.CancelledQuantity, $"allocation {a.AllocationId} cancelled"); }
+        foreach (var e in Executions) Whole(e.Quantity, $"execution {e.ExecutionId}");
+        foreach (var o in OpeningPositions.Where(o => !IsCash(o.SecurityId))) Whole(o.Quantity, $"position {o.AccountId}/{o.SecurityId}");
+        foreach (var t in Transactions.Where(t => !IsCash(t.SecurityId))) Whole(t.Quantity, $"transaction {t.TransactionId}");
+        return this;
     }
 
     /// <summary>SHA-256 over every fixture file, in a fixed order, line endings normalised to LF.</summary>

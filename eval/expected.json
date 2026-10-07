@@ -1,7 +1,7 @@
 {
   "fixture_sha256": "ab02a59d4fd2ce6a86ae0bc27fe364ce33fe8bc0a54af56d6b2b8a46be0075e6",
-  "cases_sha256": "0d2fe11c93758471a7c3d0259f273cd9667953715fbeb28094f8932712ed3905",
-  "computed_at": "2026-10-07T14:33:14Z",
+  "cases_sha256": "12381584d5d79d5e3d2d1f15fd9c38838a34c864b287580f5023bce6625c1fe7",
+  "computed_at": "2026-10-07T15:07:59Z",
   "generator": "PortfolioNlq.Reference (LINQ over fixture/*.csv; does not use the views, the catalog or the compiler)",
   "comparison_rule": "numbers compared after rounding both sides to 10 decimal places, half away from zero; display rounds to 2",
   "cases": [
@@ -42,6 +42,132 @@
             "weight_pct": "64.607745879942353506338173155",
             "target_pct": "60.0000",
             "drift_pts": "4.607745879942353506338173155"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "2900",
+            "market_value_usd": "416440.00",
+            "contribution_pct": "4.7968970144430440760124566813",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "26500",
+            "market_value_usd": "1985380.00",
+            "contribution_pct": "22.86923300964107878117762762",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "6900",
+            "market_value_usd": "3535560.00",
+            "contribution_pct": "40.725475959043917283129865873",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "5600",
+            "market_value_usd": "1277640.00",
+            "contribution_pct": "14.716903999454929481501669278",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1600",
+            "market_value_usd": "229760.00",
+            "contribution_pct": "3.6666607087685790668399563882",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "18850",
+            "market_value_usd": "1412242.00",
+            "contribution_pct": "22.537483690253985195474380613",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "5250",
+            "market_value_usd": "2690100.00",
+            "contribution_pct": "42.930379407461501339250377263",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "3700",
+            "market_value_usd": "844155.00",
+            "contribution_pct": "13.471578911083477812361957629",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1280",
+            "market_value_usd": "183808.00",
+            "contribution_pct": "5.6313173400260781757041597631",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "7600",
+            "market_value_usd": "569392.00",
+            "contribution_pct": "17.444436819246870128724228194",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2000",
+            "market_value_usd": "1024800.00",
+            "contribution_pct": "31.396751012244977990411858707",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "330817.50",
+            "contribution_pct": "10.135240708424427211497926491",
+            "target_pct": "9.0000"
           }
         }
       ]
@@ -85,6 +211,132 @@
             "drift_pts": "4.607745879942353506338173155"
           }
         }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "2900",
+            "market_value_usd": "416440.00",
+            "contribution_pct": "4.7968970144430440760124566813",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "26500",
+            "market_value_usd": "1985380.00",
+            "contribution_pct": "22.86923300964107878117762762",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "6900",
+            "market_value_usd": "3535560.00",
+            "contribution_pct": "40.725475959043917283129865873",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "5600",
+            "market_value_usd": "1277640.00",
+            "contribution_pct": "14.716903999454929481501669278",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1600",
+            "market_value_usd": "229760.00",
+            "contribution_pct": "3.6666607087685790668399563882",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "18850",
+            "market_value_usd": "1412242.00",
+            "contribution_pct": "22.537483690253985195474380613",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "5250",
+            "market_value_usd": "2690100.00",
+            "contribution_pct": "42.930379407461501339250377263",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1003 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "3700",
+            "market_value_usd": "844155.00",
+            "contribution_pct": "13.471578911083477812361957629",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1280",
+            "market_value_usd": "183808.00",
+            "contribution_pct": "5.6313173400260781757041597631",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "7600",
+            "market_value_usd": "569392.00",
+            "contribution_pct": "17.444436819246870128724228194",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2000",
+            "market_value_usd": "1024800.00",
+            "contribution_pct": "31.396751012244977990411858707",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "330817.50",
+            "contribution_pct": "10.135240708424427211497926491",
+            "target_pct": "9.0000"
+          }
+        }
       ]
     },
     {
@@ -126,6 +378,132 @@
             "drift_pts": "10.192850875795592960304292097"
           }
         }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "2900",
+            "market_value_usd": "416440.00",
+            "contribution_pct": "4.7968862398224262840430733753",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "26500",
+            "market_value_usd": "1985380.00",
+            "contribution_pct": "22.869181641577775179649978431",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "7250",
+            "market_value_usd": "3714900.00",
+            "contribution_pct": "42.791164855240446168935772937",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "5600",
+            "market_value_usd": "1277640.00",
+            "contribution_pct": "14.716870942865057913612506645",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "450",
+            "market_value_usd": "64620.00",
+            "contribution_pct": "2.7620176834100275517889001254",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "5650",
+            "market_value_usd": "423298.00",
+            "contribution_pct": "18.092797297308849313171430599",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "742980.00",
+            "contribution_pct": "31.756791990405172863325859102",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1100",
+            "market_value_usd": "250965.00",
+            "contribution_pct": "10.726861156251896696606334261",
+            "target_pct": "9.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1480",
+            "market_value_usd": "212528.00",
+            "contribution_pct": "6.5108117315190832024194358734",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "7600",
+            "market_value_usd": "569392.00",
+            "contribution_pct": "17.443367995902252045810469354",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2300",
+            "market_value_usd": "1178520.00",
+            "contribution_pct": "36.104051427717147555688443714",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "330817.50",
+            "contribution_pct": "10.134619720657110156385943156",
+            "target_pct": "9.0000"
+          }
+        }
       ]
     },
     {
@@ -145,6 +523,22 @@
             "weight_pct": "5.6313173400260781757041597631",
             "target_pct": "3.0000",
             "drift_pts": "2.6313173400260781757041597631"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1005 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1280",
+            "market_value_usd": "183808.00",
+            "contribution_pct": "5.6313173400260781757041597631",
+            "target_pct": "3.0000"
           }
         }
       ]
@@ -188,6 +582,57 @@
             "drift_pts": "2.692454457181155353953094853"
           }
         }
+      ],
+      "detail_key_columns": [
+        "household",
+        "account_number"
+      ],
+      "detail_rows": [
+        {
+          "key": "Brennan Family | LWP-1005",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "3264032.00",
+            "weight_pct": "64.607745879942353506338173155",
+            "target_pct": "60.0000"
+          }
+        },
+        {
+          "key": "Okafor Household | LWP-1003",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "6266192.00",
+            "weight_pct": "82.60610271756754341392667189",
+            "target_pct": "80.0000"
+          }
+        },
+        {
+          "key": "Okafor Household | LWP-1004",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "1455300.0000",
+            "weight_pct": "62",
+            "target_pct": "60.0000"
+          }
+        },
+        {
+          "key": "Whitfield Family | LWP-1001",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "8681445.50",
+            "weight_pct": "83.10850998258296962182161945",
+            "target_pct": "80.0000"
+          }
+        },
+        {
+          "key": "Whitfield Family | LWP-1002",
+          "status": "Complete",
+          "values": {
+            "total_mv_usd": "2339584.00",
+            "weight_pct": "61.148605906007221796695480906",
+            "target_pct": "60.0000"
+          }
+        }
       ]
     },
     {
@@ -207,6 +652,32 @@
             "weight_pct": "15.030227397038891737556838893",
             "target_pct": "20.0000",
             "drift_pts": "-4.969772602961108262443161107"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | AGGB",
+          "status": "line",
+          "values": {
+            "quantity": "10000",
+            "market_value_usd": "983100.00",
+            "contribution_pct": "11.324151029917771182229963893",
+            "target_pct": "14.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | MNLD",
+          "status": "line",
+          "values": {
+            "quantity": "6300",
+            "market_value_usd": "321741.00",
+            "contribution_pct": "3.7060763671211205553268750003",
+            "target_pct": "6.0000"
           }
         }
       ]
@@ -256,6 +727,182 @@
           "values": {},
           "reason": "no EUR/USD rate on 2026-10-02"
         }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "2900",
+            "market_value_usd": "405855.00",
+            "contribution_pct": "4.7302249081472385430550641046",
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "26500",
+            "market_value_usd": "1963650.00",
+            "contribution_pct": "22.886267610065971751167477619",
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "7250",
+            "market_value_usd": "3661975.00",
+            "contribution_pct": "42.68018222767363680059151267",
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "5600",
+            "market_value_usd": "1258880.00",
+            "contribution_pct": "14.672199510584804073083143241",
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "450",
+            "market_value_usd": "62977.50",
+            "contribution_pct": "2.7135158099377736567391190073",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "5650",
+            "market_value_usd": "418665.00",
+            "contribution_pct": "18.039047224288007748778266194",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "732395.00",
+            "contribution_pct": "31.556752993043162039259212661",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1002 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1100",
+            "market_value_usd": "247280.00",
+            "contribution_pct": "10.654570116016238654097881754",
+            "target_pct": "9.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "1480",
+            "market_value_usd": "207126.00",
+            "contribution_pct": "6.4061496265198004352913195043",
+            "target_pct": "3.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "7600",
+            "market_value_usd": "563160.00",
+            "contribution_pct": "17.417838531477896609496922125",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2300",
+            "market_value_usd": "1161730.00",
+            "contribution_pct": "35.9308643319373123591001835",
+            "target_pct": "33.0000"
+          }
+        },
+        {
+          "key": "LWP-1005 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "325960.00",
+            "contribution_pct": "10.081537480858965798053158491",
+            "target_pct": "9.0000"
+          }
+        },
+        {
+          "key": "LWP-1006 | ACMR",
+          "status": "line",
+          "values": {
+            "quantity": "340",
+            "market_value_usd": "47583.00",
+            "contribution_pct": null,
+            "target_pct": "4.0000"
+          }
+        },
+        {
+          "key": "LWP-1006 | INTD",
+          "status": "line",
+          "values": {
+            "quantity": "5000",
+            "market_value_usd": "370500.00",
+            "contribution_pct": null,
+            "target_pct": "20.0000"
+          }
+        },
+        {
+          "key": "LWP-1006 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "1500",
+            "market_value_usd": "757650.00",
+            "contribution_pct": null,
+            "target_pct": "44.0000"
+          }
+        },
+        {
+          "key": "LWP-1006 | USSC",
+          "status": "line",
+          "values": {
+            "quantity": "1150",
+            "market_value_usd": "258520.00",
+            "contribution_pct": null,
+            "target_pct": "12.0000"
+          }
+        },
+        {
+          "key": "LWP-1006 | VNTB",
+          "status": "line",
+          "values": {
+            "quantity": "21000",
+            "market_value_usd": null,
+            "contribution_pct": null,
+            "target_pct": "0"
+          }
+        }
       ]
     },
     {
@@ -297,6 +944,72 @@
             "drift_pts": "-7.384047092675562004294075548"
           }
         }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "LWP-1001 | AGGB",
+          "status": "line",
+          "values": {
+            "quantity": "10000",
+            "market_value_usd": "983100.00",
+            "contribution_pct": "11.324151029917771182229963893",
+            "target_pct": "14.0000"
+          }
+        },
+        {
+          "key": "LWP-1001 | MNLD",
+          "status": "line",
+          "values": {
+            "quantity": "6300",
+            "market_value_usd": "321741.00",
+            "contribution_pct": "3.7060763671211205553268750003",
+            "target_pct": "6.0000"
+          }
+        },
+        {
+          "key": "LWP-1004 | AGGB",
+          "status": "line",
+          "values": {
+            "quantity": "3270",
+            "market_value_usd": "321473.70",
+            "contribution_pct": "22.089857761286332714904143476",
+            "target_pct": "26.6000"
+          }
+        },
+        {
+          "key": "LWP-1004 | MNLD",
+          "status": "line",
+          "values": {
+            "quantity": "1710",
+            "market_value_usd": "87329.70",
+            "contribution_pct": "6.0008039579468150896722325294",
+            "target_pct": "11.4000"
+          }
+        },
+        {
+          "key": "LWP-1005 | AGGB",
+          "status": "line",
+          "values": {
+            "quantity": "9100",
+            "market_value_usd": "894621.00",
+            "contribution_pct": "27.408462907226399741179008049",
+            "target_pct": "26.6000"
+          }
+        },
+        {
+          "key": "LWP-1005 | MNLD",
+          "status": "line",
+          "values": {
+            "quantity": "2050",
+            "market_value_usd": "104693.50",
+            "contribution_pct": "3.2074900000980382545269164028",
+            "target_pct": "11.4000"
+          }
+        }
       ]
     },
     {
@@ -334,6 +1047,82 @@
             "drift_pts": "5.913904728338215315677067395"
           }
         }
+      ],
+      "detail_key_columns": [
+        "account_number",
+        "symbol"
+      ],
+      "detail_rows": [
+        {
+          "key": "HCC-2001 | HCXN",
+          "status": "line",
+          "values": {
+            "quantity": "52000",
+            "market_value_usd": null,
+            "contribution_pct": null,
+            "target_pct": "42.0000"
+          }
+        },
+        {
+          "key": "HCC-2001 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2800",
+            "market_value_usd": "1434720.00",
+            "contribution_pct": null,
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "HCC-2001 | VNTB",
+          "status": "line",
+          "values": {
+            "quantity": "41000",
+            "market_value_usd": "820143.090000",
+            "contribution_pct": null,
+            "target_pct": "10.0000"
+          }
+        },
+        {
+          "key": "HCC-2002 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "2150",
+            "market_value_usd": "1101660.00",
+            "contribution_pct": "13.219482889866556828378535567",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "HCC-2002 | VNTB",
+          "status": "line",
+          "values": {
+            "quantity": "62000",
+            "market_value_usd": "1240216.380000",
+            "contribution_pct": "14.882104474286295039082755705",
+            "target_pct": "10.0000"
+          }
+        },
+        {
+          "key": "HCC-2003 | USLC",
+          "status": "line",
+          "values": {
+            "quantity": "1450",
+            "market_value_usd": "742980.00",
+            "contribution_pct": "24.46013370845772065888493083",
+            "target_pct": "15.0000"
+          }
+        },
+        {
+          "key": "HCC-2003 | VNTB",
+          "status": "line",
+          "values": {
+            "quantity": "9800",
+            "market_value_usd": "196034.202000",
+            "contribution_pct": "6.453771019880494656792136565",
+            "target_pct": "10.0000"
+          }
+        }
       ]
     },
     {
@@ -342,32 +1131,64 @@
       "category": "answer",
       "outcome": "rows",
       "key_columns": [
+        "custodian",
         "symbol",
-        "custodian"
+        "side"
       ],
       "rows": [
         {
-          "key": "ACMR | Schwab",
+          "key": "Schwab | ACMR | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "120",
             "executed_qty": "0",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "120",
             "order_status": "Working",
             "allocation_count": "1"
           }
         },
         {
-          "key": "USLC | Schwab",
+          "key": "Schwab | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "500",
             "executed_qty": "350",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "150",
             "order_status": "Partially filled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9011",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9021",
+          "status": "line",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "line_status": "Working"
           }
         }
       ]
@@ -378,31 +1199,63 @@
       "category": "answer",
       "outcome": "rows",
       "key_columns": [
-        "symbol"
+        "symbol",
+        "side"
       ],
       "rows": [
         {
-          "key": "ACMR",
+          "key": "ACMR | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "120",
             "executed_qty": "0",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "120",
             "order_status": "Working",
             "allocation_count": "1"
           }
         },
         {
-          "key": "USLC",
+          "key": "USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "500",
             "executed_qty": "350",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "150",
             "order_status": "Partially filled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9011",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9021",
+          "status": "line",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "line_status": "Working"
           }
         }
       ]
@@ -414,31 +1267,89 @@
       "outcome": "rows",
       "key_columns": [
         "account_number",
-        "custodian"
+        "custodian",
+        "symbol",
+        "side"
       ],
       "rows": [
         {
-          "key": "LWP-1001 | Schwab",
+          "key": "LWP-1001 | Schwab | ACMR | Sell",
           "status": "Complete",
           "values": {
-            "allocated_qty": "620",
-            "executed_qty": "350",
+            "allocated_qty": "120",
+            "executed_qty": "0",
             "cancelled_qty": "0",
-            "remaining_qty": "270",
-            "order_status": "Mixed",
-            "allocation_count": "2"
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "order_status": "Working",
+            "allocation_count": "1"
           }
         },
         {
-          "key": "LWP-1002 | Fidelity",
+          "key": "LWP-1001 | Schwab | USLC | Sell",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "LWP-1002 | Fidelity | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "250",
             "executed_qty": "100",
             "cancelled_qty": "150",
+            "expired_qty": "0",
             "remaining_qty": "0",
             "order_status": "Remainder cancelled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9011",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9013",
+          "status": "line",
+          "values": {
+            "allocated_qty": "250",
+            "executed_qty": "100",
+            "cancelled_qty": "150",
+            "expired_qty": "0",
+            "remaining_qty": "0",
+            "line_status": "Remainder cancelled"
+          }
+        },
+        {
+          "key": "9021",
+          "status": "line",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "line_status": "Working"
           }
         }
       ]
@@ -450,32 +1361,64 @@
       "outcome": "rows",
       "key_columns": [
         "account_number",
+        "custodian",
         "symbol",
-        "custodian"
+        "side"
       ],
       "rows": [
         {
-          "key": "HCC-2002 | USLC | Northern Trust",
+          "key": "HCC-2002 | Northern Trust | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "400",
             "executed_qty": "250",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "150",
             "order_status": "Partially filled",
             "allocation_count": "1"
           }
         },
         {
-          "key": "HCC-2002 | VNTB | Northern Trust",
+          "key": "HCC-2002 | Northern Trust | VNTB | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "500",
             "executed_qty": "0",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "500",
             "order_status": "Working",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9052",
+          "status": "line",
+          "values": {
+            "allocated_qty": "400",
+            "executed_qty": "250",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9061",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "500",
+            "line_status": "Working"
           }
         }
       ]
@@ -486,31 +1429,64 @@
       "category": "answer",
       "outcome": "rows",
       "key_columns": [
-        "account_number"
+        "account_number",
+        "symbol",
+        "side"
       ],
       "rows": [
         {
-          "key": "HCC-2001",
+          "key": "HCC-2001 | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "600",
             "executed_qty": "500",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "100",
             "order_status": "Partially filled",
             "allocation_count": "1"
           }
         },
         {
-          "key": "HCC-2002",
+          "key": "HCC-2002 | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "400",
             "executed_qty": "250",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "150",
             "order_status": "Partially filled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9051",
+          "status": "line",
+          "values": {
+            "allocated_qty": "600",
+            "executed_qty": "500",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "100",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9052",
+          "status": "line",
+          "values": {
+            "allocated_qty": "400",
+            "executed_qty": "250",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
           }
         }
       ]
@@ -522,20 +1498,123 @@
       "outcome": "rows",
       "key_columns": [
         "account_number",
+        "custodian",
         "symbol",
-        "custodian"
+        "side"
       ],
       "rows": [
         {
-          "key": "LWP-1002 | USLC | Fidelity",
+          "key": "LWP-1002 | Fidelity | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "250",
             "executed_qty": "100",
             "cancelled_qty": "150",
+            "expired_qty": "0",
             "remaining_qty": "0",
             "order_status": "Remainder cancelled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9013",
+          "status": "line",
+          "values": {
+            "allocated_qty": "250",
+            "executed_qty": "100",
+            "cancelled_qty": "150",
+            "expired_qty": "0",
+            "remaining_qty": "0",
+            "line_status": "Remainder cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "B07",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "account_number",
+        "custodian",
+        "symbol",
+        "side"
+      ],
+      "rows": [],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": []
+    },
+    {
+      "case_id": "B08",
+      "tenant_id": 1,
+      "category": "answer",
+      "outcome": "rows",
+      "key_columns": [
+        "symbol",
+        "side"
+      ],
+      "rows": [
+        {
+          "key": "ACMR | Sell",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "order_status": "Working",
+            "allocation_count": "1"
+          }
+        },
+        {
+          "key": "USLC | Sell",
+          "status": "Complete",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "200",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "300",
+            "order_status": "Partially filled",
+            "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9011",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "200",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "300",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9021",
+          "status": "line",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "line_status": "Working"
           }
         }
       ]
@@ -546,7 +1625,9 @@
       "category": "clarification",
       "outcome": "clarify",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "C02",
@@ -554,7 +1635,9 @@
       "category": "clarification",
       "outcome": "clarify",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "C03",
@@ -562,7 +1645,9 @@
       "category": "clarification",
       "outcome": "clarify",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "C04",
@@ -570,7 +1655,9 @@
       "category": "clarification",
       "outcome": "clarify",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "R01",
@@ -578,7 +1665,9 @@
       "category": "refusal",
       "outcome": "refuse",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "R02",
@@ -586,7 +1675,9 @@
       "category": "refusal",
       "outcome": "refuse",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "R03",
@@ -594,7 +1685,9 @@
       "category": "refusal",
       "outcome": "refuse",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "R04",
@@ -602,7 +1695,9 @@
       "category": "refusal",
       "outcome": "refuse",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "X01",
@@ -611,10 +1706,15 @@
       "outcome": "rows",
       "key_columns": [
         "account_number",
+        "custodian",
         "symbol",
-        "custodian"
+        "side"
       ],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": []
     },
     {
       "case_id": "X02",
@@ -623,32 +1723,64 @@
       "outcome": "rows",
       "key_columns": [
         "account_number",
+        "custodian",
         "symbol",
-        "custodian"
+        "side"
       ],
       "rows": [
         {
-          "key": "LWP-1001 | ACMR | Schwab",
+          "key": "LWP-1001 | Schwab | ACMR | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "120",
             "executed_qty": "0",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "120",
             "order_status": "Working",
             "allocation_count": "1"
           }
         },
         {
-          "key": "LWP-1001 | USLC | Schwab",
+          "key": "LWP-1001 | Schwab | USLC | Sell",
           "status": "Complete",
           "values": {
             "allocated_qty": "500",
             "executed_qty": "350",
             "cancelled_qty": "0",
+            "expired_qty": "0",
             "remaining_qty": "150",
             "order_status": "Partially filled",
             "allocation_count": "1"
+          }
+        }
+      ],
+      "detail_key_columns": [
+        "allocation_id"
+      ],
+      "detail_rows": [
+        {
+          "key": "9011",
+          "status": "line",
+          "values": {
+            "allocated_qty": "500",
+            "executed_qty": "350",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "150",
+            "line_status": "Partially filled"
+          }
+        },
+        {
+          "key": "9021",
+          "status": "line",
+          "values": {
+            "allocated_qty": "120",
+            "executed_qty": "0",
+            "cancelled_qty": "0",
+            "expired_qty": "0",
+            "remaining_qty": "120",
+            "line_status": "Working"
           }
         }
       ]
@@ -659,7 +1791,9 @@
       "category": "authorization",
       "outcome": "nothing",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "X04",
@@ -667,7 +1801,9 @@
       "category": "authorization",
       "outcome": "nothing",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     },
     {
       "case_id": "X05",
@@ -675,7 +1811,9 @@
       "category": "authorization",
       "outcome": "nothing",
       "key_columns": [],
-      "rows": []
+      "rows": [],
+      "detail_key_columns": [],
+      "detail_rows": []
     }
   ]
 }

@@ -104,9 +104,9 @@ public static class Commands
     /// <summary>Grades one trace against its case and its independent expectation.</summary>
     public static Grade GradeOne(string caseId, AnswerTrace t, FixtureSet f)
     {
-        var c = EvalFile.Load(Repo.CasesFile).Cases.Single(x => x.Id == caseId);
+        var c = CaseFile.Load(Repo.CasesFile).Cases.Single(x => x.Id == caseId);
         var e = ExpectedFile.Load(Repo.ExpectedFile).Cases.Single(x => x.CaseId == caseId);
-        return Grader.GradeCase(c.Set, e, t, f, c.Spec?.AsOf, c.Spec?.Basis, c.Spec?.Measure);
+        return Grader.GradeCase(c, e, t, f);
     }
 
     public static RunSummary Grade(string runId, string recordingId, string mode, string executedOn, FixtureSet f, EvalFile eval, IReadOnlyList<AnswerTrace> traces)
@@ -119,11 +119,12 @@ public static class Commands
             ExecutedAt = traces.Count > 0 ? traces[0].ExecutedAt : "", FixtureId = f.FixtureId, FixtureSha256 = f.Sha256,
             ModelId = string.Join(", ", traces.Select(t => t.Model.ModelId).Where(m => m is not null).Distinct()),
         };
+        var cases = CaseFile.Load(Repo.CasesFile);
         foreach (var t in traces)
         {
-            var c = eval.Cases.Single(x => x.Id == t.CaseId);
+            var c = cases.Cases.Single(x => x.Id == t.CaseId);
             var e = expected.Cases.Single(x => x.CaseId == t.CaseId);
-            s.Grades.Add(Grader.GradeCase(c.Set, e, t, f, c.Spec?.AsOf, c.Spec?.Basis, c.Spec?.Measure));
+            s.Grades.Add(Grader.GradeCase(c, e, t, f));
             s.TraceSha256[t.CaseId] = t.ContentSha256();
         }
         s.ByCategory = s.Grades.GroupBy(g => g.Category).ToDictionary(g => g.Key, g => g.GroupBy(x => x.Verdict).ToDictionary(v => v.Key, v => v.Count()));
@@ -153,7 +154,8 @@ public static class Commands
         var recomputed = eval.Cases.Select(new ReferenceCalculator(f).Compute).ToList();
         var a = JsonSerializer.Serialize(recomputed, ExpectedFile.Json);
         var b = JsonSerializer.Serialize(expected.Cases.Select(c => new ExpectedCase(c.CaseId, c.TenantId, c.Category, c.Outcome, c.KeyColumns,
-            c.Rows.Select(r => new ExpectedRow(r.Key, r.Status, r.Values, r.Reason)).ToList())).ToList(), ExpectedFile.Json);
+            c.Rows.Select(r => new ExpectedRow(r.Key, r.Status, r.Values, r.Reason)).ToList(), c.DetailKeyColumns,
+            c.DetailRows.Select(r => new ExpectedRow(r.Key, r.Status, r.Values, r.Reason)).ToList())).ToList(), ExpectedFile.Json);
         if (a != b) problems.Add("independent expected results recomputed from the fixture differ from eval/expected.json");
         else Console.WriteLine($"expected       recomputed independently, identical to eval/expected.json ({recomputed.Count} cases)");
 
@@ -172,11 +174,12 @@ public static class Commands
             if (stored.Model.RawResponse != translator.Load(c.Id).Attempts.SingleOrDefault(x => x.N == translator.Load(c.Id).AttemptUsed)?.ResultText)
                 problems.Add($"{c.Id}: recorded reply differs from the reply in the trace");
             var fresh = await dbless.AnswerAsync(c.Id, c.Question, new ScopeIdentity(c.TenantId, "verify"), CancellationToken.None);
-            var same = fresh.Sql == stored.Sql && JsonSerializer.Serialize(fresh.Parameters) == JsonSerializer.Serialize(stored.Parameters)
+            if (stored.ContentSha256() != summary.TraceSha256.GetValueOrDefault(c.Id)) problems.Add($"{c.Id}: the trace file no longer matches the hash recorded in summary.json");
+            var same = fresh.Sql == stored.Sql && fresh.DetailSql == stored.DetailSql && JsonSerializer.Serialize(fresh.Parameters) == JsonSerializer.Serialize(stored.Parameters)
                        && fresh.Outcome == (stored.Outcome == "error" && stored.Sql is not null ? "answered" : stored.Outcome);
             if (same) sqlMatches++; else problems.Add($"{c.Id}: replaying the recorded reply gives {fresh.Outcome} / different SQL than the stored run ({stored.Outcome})");
         }
-        Console.WriteLine($"replay         {sqlMatches}/{eval.Cases.Count} recorded replies parse, validate and compile to the exact SQL and parameters stored in {Path.GetFileName(runDir)}");
+        Console.WriteLine($"replay         {sqlMatches}/{eval.Cases.Count} recorded replies parse, validate and compile to the exact SQL, contributing-line SQL and parameters stored in {Path.GetFileName(runDir)}");
 
         var regraded = Grade(summary.RunId, summary.RecordingId, summary.Mode, summary.ExecutedOn, f, eval, traces);
         var sameGrades = JsonSerializer.Serialize(regraded.Grades, Json) == JsonSerializer.Serialize(summary.Grades, Json);
@@ -194,7 +197,9 @@ public static class Commands
     {
         var a = JsonSerializer.Deserialize<RunSummary>(File.ReadAllText(Path.Combine(runA, "summary.json")), Json)!;
         var b = JsonSerializer.Deserialize<RunSummary>(File.ReadAllText(Path.Combine(runB, "summary.json")), Json)!;
-        var diff = a.TraceSha256.Where(kv => b.TraceSha256.GetValueOrDefault(kv.Key) != kv.Value).Select(kv => kv.Key).ToList();
+        // Hashes are recomputed from the trace files, not read from the summaries.
+        string Hash(string run, string id) => AnswerTrace.Load(Path.Combine(run, "traces", id + ".json")).ContentSha256();
+        var diff = a.TraceSha256.Keys.Where(id => Hash(runA, id) != Hash(runB, id)).ToList();
         Console.WriteLine(diff.Count == 0
             ? $"identical: all {a.TraceSha256.Count} answers (outcome, SQL, parameters, rows) match between {a.RunId} and {b.RunId}"
             : "different answers: " + string.Join(", ", diff));

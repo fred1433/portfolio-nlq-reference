@@ -39,6 +39,8 @@ public static class Validator
 {
     public static ValidationOutcome Validate(ModelOutput o, DirectorySnapshot dir, ReferenceClock clock)
     {
+        if (o.GroupBy is not null && o.GroupBy.Any(string.IsNullOrWhiteSpace)) return ValidationOutcome.Reject("group_by contains an empty member");
+        if (o.Filters is not null && o.Filters.Any(f => f is null)) return ValidationOutcome.Reject("filters contain an empty member");
         switch (o.Kind)
         {
             case "clarify":
@@ -75,6 +77,8 @@ public static class Validator
             if (o.Threshold.Direction is not ("above" or "below" or "either")) return ValidationOutcome.Reject("threshold direction must be above, below or either");
             if (o.Threshold.Points is not > 0 and not null || o.Threshold.Points > 100) return ValidationOutcome.Reject("threshold points must be between 0 and 100");
             if (o.Threshold.Points is null) return ValidationOutcome.Ask("How many points of drift should count?");
+            if (o.Threshold.Points.Value != Math.Round(o.Threshold.Points.Value, 4))
+                return ValidationOutcome.Ask($"Thresholds are supported to four decimal places; {o.Threshold.Points.Value.ToString(CultureInfo.InvariantCulture)} has more. Which threshold should I use?");
             direction = o.Threshold.Direction; points = o.Threshold.Points;
         }
 
@@ -85,12 +89,14 @@ public static class Validator
         if (basis is not ("trade" or "settlement")) return ValidationOutcome.Reject("date_basis must be trade or settlement");
         if (o.DateBasis is null) defaults.Add("trade-date positions");
 
+        if (o.AsOf?.Time is not null) return ValidationOutcome.Reject("drift is read at a close; a time of day does not apply");
         var (asOf, dateProblem) = ResolveDate(o.AsOf, dir, clock, defaults);
         if (dateProblem is not null) return ValidationOutcome.Ask(dateProblem);
 
         var (filters, filterOutcome) = ResolveFilters(o.Filters, QueryCatalog.DriftFilters, dir);
         var q = new ResolvedQuery(QueryCatalog.Drift, o.Dimension.Type, dimValue, direction, points, groupBy, basis, asOf,
-            asOf!.Value.ToDateTime(new TimeOnly(23, 59, 59)), null, null, "n/a", filters, defaults, QueryCatalog.Definitions[QueryCatalog.Drift]);
+            asOf!.Value.ToDateTime(new TimeOnly(23, 59, 59)), null, null, "n/a", filters, defaults,
+            QueryCatalog.Definitions[groupBy[0] == "household" ? QueryCatalog.DriftHousehold : QueryCatalog.Drift]);
         return filterOutcome is null ? new(OutcomeKind.Query, q, null, "validator") : filterOutcome with { Query = filterOutcome.Kind == OutcomeKind.NoMatchInScope ? q : null };
     }
 
@@ -122,11 +128,22 @@ public static class Validator
         }
         else
         {
-            var (d, problem) = ResolveCalendarDate(o.AsOf, clock, dir.CloseDates);
+            var dateOnly = o.AsOf.Date is null && o.AsOf.Month is null && o.AsOf.Day is null && o.AsOf.Relative is null;
+            var (d, problem) = dateOnly ? (clock.Today, null) : ResolveCalendarDate(o.AsOf, clock, dir.CloseDates);
             if (problem is not null) return ValidationOutcome.Ask(problem);
             asOf = d;
-            var endOfDay = d!.Value.ToDateTime(new TimeOnly(23, 59, 59));
-            asOfTime = endOfDay < clock.LocalNow ? endOfDay : clock.LocalNow; // a day not over yet is read up to the reference time
+            if (o.AsOf.Time is not null)
+            {
+                if (!TimeOnly.TryParseExact(o.AsOf.Time, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var tod))
+                    return ValidationOutcome.Ask($"'{o.AsOf.Time}' is not a time of day. Which time do you mean?");
+                asOfTime = d!.Value.ToDateTime(tod);
+                if (asOfTime > clock.LocalNow) return ValidationOutcome.Ask($"{asOfTime:yyyy-MM-dd HH:mm} is after the reference time {clock.LocalNow:yyyy-MM-dd HH:mm}. Which time do you mean?");
+            }
+            else
+            {
+                var endOfDay = d!.Value.ToDateTime(new TimeOnly(23, 59, 59));
+                asOfTime = endOfDay < clock.LocalNow ? endOfDay : clock.LocalNow; // a day not over yet is read up to the reference time
+            }
         }
 
         var (filters, filterOutcome) = ResolveFilters(o.Filters, QueryCatalog.AllocationFilters, dir);

@@ -22,7 +22,7 @@ public class EvaluationOnSqlTests
         var dir = await new FixtureEntityDirectory(f).LoadAsync(new(tenant, "t"), default);
         var q = Validator.Validate(ModelOutputParser.Parse(json).Output!, dir, Clock).Query!;
         var c = SqlCompiler.Compile(q);
-        if (mutate is not null) c = c with { Sql = mutate(c.Sql) };
+        if (mutate is not null) c = c with { Sql = mutate(c.Sql), DetailSql = c.DetailSql is null ? null : mutate(c.DetailSql) };
         var r = await new ScopedQueryExecutor(reader).ExecuteAsync(new(tenant, "t"), c, default);
         Assert.Equal("complete", r.Status);
         return (q, r);
@@ -81,12 +81,11 @@ public class EvaluationOnSqlTests
     [SqlFact]
     public async Task Injected_defect_greater_or_equal_threshold_is_caught_by_the_evaluation()
     {
-        var expected = ExpectedFile.Load(Repo.ExpectedFile).Cases.Single(c => c.CaseId == "A01");
-        Grade GradeOf(ResolvedQuery q, ExecutionResult r) => Grader.GradeCase("tuning", expected, new AnswerTrace
+        Grade GradeOf(ResolvedQuery q, ExecutionResult r) => Commands.GradeOne("A01", new AnswerTrace
         {
             CaseId = "A01", TenantId = 1, Outcome = "answered", Interpretation = q, ExecutionStatus = r.Status,
-            Columns = r.Columns.ToList(), Rows = r.Rows.ToList(),
-        }, Base, "2026-10-06", "trade", "drift");
+            Columns = r.Columns.ToList(), Rows = r.Rows.ToList(), DetailRows = r.DetailRows.ToList(),
+        }, Base);
 
         var (q, good) = await Run(Db.Reader!, Base, A01);
         Assert.True(GradeOf(q, good).Passed);

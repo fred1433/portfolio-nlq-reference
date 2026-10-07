@@ -50,6 +50,7 @@ public sealed class AnswerTrace
     public string Outcome { get; set; } = "";              // answered | clarify | refuse | rejected | no_match_in_scope | error
     public string? OutcomeMessage { get; set; }
     public string? OutcomeSource { get; set; }
+    public string? ErrorCategory { get; set; }          // provider | lookup | validation | compile | execution | cancelled
     public int TenantId { get; set; }
     public string UserId { get; set; } = "";
     public string Scope { get; set; } = "";

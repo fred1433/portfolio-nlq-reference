@@ -30,8 +30,8 @@ public class CompilerTests
     public void Incomplete_accounts_are_kept_in_the_result_never_filtered_out_or_zeroed()
     {
         var q = C("""{"kind":"query","measure":"drift","dimension":{"type":"asset_class","value":"Equity"},"threshold":{"direction":"above","points":2}}""");
-        Assert.Contains("WHERE missing_detail IS NOT NULL OR", q.Sql);
-        Assert.Contains("CASE WHEN agg.missing_detail IS NULL", q.Sql);
+        Assert.Contains("WHERE row_status <> 'Complete' OR", q.Sql);
+        Assert.Contains("CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0", q.Sql);
     }
 
     [Fact]
@@ -49,8 +49,8 @@ public class CompilerTests
     public void Allocation_groups_follow_the_request()
     {
         var q = C("""{"kind":"query","measure":"open_allocations","side":"sell","group_by":["security","custodian"],"filters":[{"field":"account","value":"Whitfield Family Trust"}]}""");
-        Assert.Equal(["symbol", "custodian"], q.KeyColumns);
-        Assert.Contains("GROUP BY symbol, security_name, custodian", q.Sql);
+        Assert.Equal(["custodian", "symbol", "side"], q.KeyColumns); // security and side always kept
+        Assert.Contains("GROUP BY custodian, symbol, security_name, side", q.Sql);
         Assert.Contains(q.Parameters, p => p.Name == "@side" && p.Value == "Sell");
     }
 }

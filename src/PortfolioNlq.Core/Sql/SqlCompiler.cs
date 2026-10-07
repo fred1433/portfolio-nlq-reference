@@ -16,7 +16,7 @@ public sealed record CompiledQuery(string Sql, IReadOnlyList<QueryParameter> Par
 /// </summary>
 public static class SqlCompiler
 {
-    public const string Version = "compiler-2026.10.3";
+    public const string Version = "compiler-2026.10.4";
 
     public static CompiledQuery Compile(ResolvedQuery q) => q.Measure switch
     {
@@ -72,11 +72,15 @@ public static class SqlCompiler
         return sb.ToString();
     }
 
+    // Row status: Incomplete (a position has no close or no FX rate), No valuation (nothing to value), else Complete.
+    const string StatusExpr = "CASE WHEN missing_detail IS NOT NULL THEN 'Incomplete' WHEN COALESCE(total_mv_usd, 0) = 0 THEN 'No valuation' ELSE 'Complete' END";
+
     static CompiledQuery DriftByAccount(ResolvedQuery q)
     {
         var p = DriftParameters(q);
         var filters = AccountFilters(q, p, "a");
-        var head = $"""
+        var keep = ThresholdClause(q, "weight_pct - target_pct");
+        var ctes = $"""
 WITH dim AS (
 {DimensionCte(q)}
 ), acct AS (
@@ -86,10 +90,7 @@ WITH dim AS (
 ), pos AS (
     SELECT p.account_id, p.security_id, p.market_value_usd, p.missing_reason
     FROM rpt.fn_positions(@as_of, @basis) AS p
-)
-""";
-        var ctes = head + $"""
-, tgt AS (
+), tgt AS (
     SELECT t.account_id, SUM(t.target_weight) AS target_weight
     FROM rpt.fn_account_targets() AS t
     WHERE t.security_id IN (SELECT security_id FROM dim)
@@ -103,50 +104,61 @@ WITH dim AS (
     LEFT JOIN pos ON pos.account_id = acct.account_id
     LEFT JOIN dim ON dim.security_id = pos.security_id
     GROUP BY acct.account_id
-), scored AS (
-    SELECT acct.account_number, acct.account_name, acct.household, acct.custodian, acct.model,
-           agg.total_mv_usd, agg.missing_detail,
-           CASE WHEN agg.missing_detail IS NULL
-                THEN CAST(agg.dim_mv_usd AS decimal(20,6)) * 100 / CAST(agg.total_mv_usd AS decimal(20,6)) END AS weight_pct,
-           CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct
+), valued AS (
+    SELECT acct.account_id, acct.account_number, acct.account_name, acct.household, acct.custodian, acct.model,
+           agg.total_mv_usd, agg.dim_mv_usd, agg.missing_detail, tgt.target_weight
     FROM acct
     JOIN agg ON agg.account_id = acct.account_id
     LEFT JOIN tgt ON tgt.account_id = acct.account_id
+), scored AS (
+    SELECT account_id, account_number, account_name, household, custodian, model, total_mv_usd, missing_detail,
+           {StatusExpr} AS row_status,
+           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0
+                THEN CAST(dim_mv_usd AS decimal(20,6)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS weight_pct,
+           CAST(COALESCE(target_weight, 0) * 100 AS decimal(20,10)) AS target_pct
+    FROM valued
 )
 """;
-        var keep = ThresholdClause(q, "weight_pct - target_pct");
         var sql = ctes + $"""
 SELECT account_number, account_name, household, custodian, model,
-       CASE WHEN missing_detail IS NULL THEN total_mv_usd END AS total_mv_usd,
+       CASE WHEN row_status = 'Complete' THEN total_mv_usd END AS total_mv_usd,
        weight_pct, target_pct, weight_pct - target_pct AS drift_pts,
-       CASE WHEN missing_detail IS NULL THEN 'Complete' ELSE 'Incomplete' END AS row_status,
-       missing_detail
+       row_status, missing_detail
 FROM scored
-WHERE missing_detail IS NOT NULL OR {keep}
-ORDER BY CASE WHEN missing_detail IS NULL THEN 0 ELSE 1 END, weight_pct - target_pct DESC, account_number;
+WHERE row_status <> 'Complete' OR {keep}
+ORDER BY CASE WHEN row_status = 'Complete' THEN 0 ELSE 1 END, weight_pct - target_pct DESC, account_number;
 """;
-        // Lines behind the answer only: the same accounts as the result, plus the unpriced line of an incomplete account.
+        // Lines behind the answer only: for each account in the result, the sleeve positions held, the sleeve securities
+        // its model targets but it does not hold, and any position without a close or an FX rate.
         var detail = ctes + $"""
 , kept AS (
-    SELECT account_number, missing_detail FROM scored WHERE missing_detail IS NOT NULL OR {keep}
-), tot AS (
-    SELECT pos.account_id, SUM(pos.market_value_usd) AS total_mv_usd FROM pos GROUP BY pos.account_id
+    SELECT account_id, account_number, row_status FROM scored WHERE row_status <> 'Complete' OR {keep}
 ), tgt_sec AS (
     SELECT t.account_id, t.security_id, t.target_weight FROM rpt.fn_account_targets() AS t
+), held AS (
+    SELECT p.* FROM rpt.fn_positions(@as_of, @basis) AS p JOIN kept ON kept.account_id = p.account_id
+), lines AS (
+    SELECT account_id, security_id FROM held WHERE security_id IN (SELECT security_id FROM dim) OR missing_reason IS NOT NULL
+    UNION
+    SELECT t.account_id, t.security_id FROM tgt_sec AS t JOIN kept ON kept.account_id = t.account_id
+    WHERE t.security_id IN (SELECT security_id FROM dim)
+), tot AS (
+    SELECT account_id, SUM(market_value_usd) AS total_mv_usd FROM held GROUP BY account_id
 )
-SELECT acct.account_number, p.symbol, p.security_name, p.quantity, p.currency, p.close_price, p.usd_per_unit,
-       p.market_value_usd,
-       CASE WHEN kept.missing_detail IS NULL
-            THEN CAST(p.market_value_usd AS decimal(20,6)) * 100 / CAST(tot.total_mv_usd AS decimal(20,6)) END AS contribution_pct,
-       CAST(COALESCE(tgt_sec.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct,
-       p.missing_reason
-FROM acct
-JOIN kept ON kept.account_number = acct.account_number
-JOIN rpt.fn_positions(@as_of, @basis) AS p ON p.account_id = acct.account_id
-JOIN tot ON tot.account_id = acct.account_id
-LEFT JOIN tgt_sec ON tgt_sec.account_id = acct.account_id AND tgt_sec.security_id = p.security_id
-WHERE p.security_id IN (SELECT security_id FROM dim) OR p.missing_reason IS NOT NULL
-ORDER BY acct.account_number, p.market_value_usd DESC, p.symbol;
+SELECT kept.account_number, s.symbol, s.security_name, COALESCE(h.quantity, 0) AS quantity, s.currency, h.close_price, h.usd_per_unit,
+       CASE WHEN h.security_id IS NULL THEN 0 ELSE h.market_value_usd END AS market_value_usd,
+       CASE WHEN kept.row_status = 'Complete'
+            THEN CASE WHEN h.security_id IS NULL THEN 0
+                      ELSE CAST(h.market_value_usd AS decimal(20,6)) * 100 / CAST(tot.total_mv_usd AS decimal(20,6)) END END AS contribution_pct,
+       CAST(COALESCE(ts.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct,
+       h.missing_reason
+FROM lines AS l
+JOIN kept ON kept.account_id = l.account_id
+JOIN rpt.v_securities AS s ON s.security_id = l.security_id
+LEFT JOIN held AS h ON h.account_id = l.account_id AND h.security_id = l.security_id
+LEFT JOIN tot ON tot.account_id = l.account_id
+LEFT JOIN tgt_sec AS ts ON ts.account_id = l.account_id AND ts.security_id = l.security_id
+ORDER BY kept.account_number, CASE WHEN h.security_id IS NULL THEN 0 ELSE h.market_value_usd END DESC, s.symbol;
 """;
         return new(sql, p, detail, ["account_number"]);
     }
@@ -155,11 +167,12 @@ ORDER BY acct.account_number, p.market_value_usd DESC, p.symbol;
     {
         var p = DriftParameters(q);
         var filters = AccountFilters(q, p, "a");
-        var sql = $"""
+        var keep = ThresholdClause(q, "weight_pct - target_pct");
+        var ctes = $"""
 WITH dim AS (
 {DimensionCte(q)}
 ), acct AS (
-    SELECT a.account_id, a.household_id, a.household
+    SELECT a.account_id, a.account_number, a.household_id, a.household
     FROM rpt.v_accounts AS a
     WHERE a.household_id IS NOT NULL{filters}
 ), pos AS (
@@ -171,14 +184,14 @@ WITH dim AS (
     WHERE t.security_id IN (SELECT security_id FROM dim)
     GROUP BY t.account_id
 ), per_account AS (
-    SELECT acct.account_id, acct.household_id, acct.household,
+    SELECT acct.account_id, acct.account_number, acct.household_id, acct.household,
            SUM(pos.market_value_usd) AS total_mv_usd,
            SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,
            STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail
     FROM acct
     LEFT JOIN pos ON pos.account_id = acct.account_id
     LEFT JOIN dim ON dim.security_id = pos.security_id
-    GROUP BY acct.account_id, acct.household_id, acct.household
+    GROUP BY acct.account_id, acct.account_number, acct.household_id, acct.household
 ), hh AS (
     SELECT pa.household,
            COUNT(*) AS account_count,
@@ -191,30 +204,46 @@ WITH dim AS (
     GROUP BY pa.household_id, pa.household
 ), scored AS (
     SELECT household, account_count, total_mv_usd, missing_detail,
-           CASE WHEN missing_detail IS NULL
+           {StatusExpr} AS row_status,
+           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0
                 THEN CAST(dim_mv_usd AS decimal(20,6)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS weight_pct,
-           CASE WHEN missing_detail IS NULL
+           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0
                 THEN CAST(target_mv_usd AS decimal(24,10)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS target_pct
     FROM hh
 )
-SELECT household, account_count,
-       CASE WHEN missing_detail IS NULL THEN total_mv_usd END AS total_mv_usd,
-       weight_pct, target_pct, weight_pct - target_pct AS drift_pts,
-       CASE WHEN missing_detail IS NULL THEN 'Complete' ELSE 'Incomplete' END AS row_status,
-       missing_detail
-FROM scored
-WHERE missing_detail IS NOT NULL OR {ThresholdClause(q, "weight_pct - target_pct")}
-ORDER BY CASE WHEN missing_detail IS NULL THEN 0 ELSE 1 END, weight_pct - target_pct DESC, household;
 """;
-        return new(sql, p, null, ["household"]);
+        var sql = ctes + $"""
+SELECT household, account_count,
+       CASE WHEN row_status = 'Complete' THEN total_mv_usd END AS total_mv_usd,
+       weight_pct, target_pct, weight_pct - target_pct AS drift_pts,
+       row_status, missing_detail
+FROM scored
+WHERE row_status <> 'Complete' OR {keep}
+ORDER BY CASE WHEN row_status = 'Complete' THEN 0 ELSE 1 END, weight_pct - target_pct DESC, household;
+""";
+        // The component accounts of each household in the result: value, sleeve weight, model target.
+        var detail = ctes + $"""
+SELECT pa.household, pa.account_number,
+       CASE WHEN pa.missing_detail IS NULL THEN COALESCE(pa.total_mv_usd, 0) END AS total_mv_usd,
+       CASE WHEN pa.missing_detail IS NULL AND COALESCE(pa.total_mv_usd, 0) <> 0
+            THEN CAST(pa.dim_mv_usd AS decimal(20,6)) * 100 / CAST(pa.total_mv_usd AS decimal(20,6)) END AS weight_pct,
+       CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct
+FROM per_account AS pa
+LEFT JOIN tgt ON tgt.account_id = pa.account_id
+WHERE pa.household IN (SELECT household FROM scored WHERE row_status <> 'Complete' OR {keep})
+ORDER BY pa.household, pa.account_number;
+""";
+        return new(sql, p, detail, ["household"]);
     }
 
+    // Security and side are always kept in the rows: quantities of different securities or directions are never added.
     static readonly (string Group, string[] Columns, string Key)[] AllocationGroups =
     [
         ("account", ["account_number", "account_name"], "account_number"),
-        ("security", ["symbol", "security_name"], "symbol"),
         ("custodian", ["custodian"], "custodian"),
-        ("block", ["block_id", "side"], "block_id"),
+        ("block", ["block_id"], "block_id"),
+        ("security", ["symbol", "security_name"], "symbol"),
+        ("side", ["side"], "side"),
     ];
 
     static CompiledQuery Allocations(ResolvedQuery q)
@@ -224,43 +253,61 @@ ORDER BY CASE WHEN missing_detail IS NULL THEN 0 ELSE 1 END, weight_pct - target
         if (q.Side is not null) { p.Add(new("@side", "varchar(4)", q.Side)); where.Append("\n      AND l.side = @side"); }
         if (q.AssetClass is not null) { p.Add(new("@asset_class", "nvarchar(40)", q.AssetClass)); where.Append("\n      AND l.asset_class = @asset_class"); }
         where.Append(AccountFilters(q, p, "l"));
-        var groups = AllocationGroups.Where(g => q.GroupBy.Contains(g.Group)).ToList();
+        var groups = AllocationGroups.Where(g => q.GroupBy.Contains(g.Group) || g.Group is "security" or "side").ToList();
         var cols = string.Join(", ", groups.SelectMany(g => g.Columns));
-        var sql = $"""
+        var status = q.Status == "open" ? "remaining_qty > 0" : "1 = 1";
+        var ctes = $"""
 WITH ex AS (
     SELECT e.allocation_id, SUM(e.quantity) AS executed_qty
     FROM rpt.v_executions AS e
     WHERE e.executed_at <= @as_of_time
     GROUP BY e.allocation_id
 ), lines AS (
-    SELECT l.allocation_id, l.block_id, l.side, l.symbol, l.security_name, l.account_number, l.account_name, l.custodian,
+    SELECT l.allocation_id, l.block_id, l.side, l.time_in_force, l.expires_at, l.symbol, l.security_name,
+           l.account_number, l.account_name, l.custodian,
            l.allocated_quantity,
            COALESCE(ex.executed_qty, 0) AS executed_qty,
            CASE WHEN l.cancelled_at <= @as_of_time THEN l.cancelled_quantity ELSE 0 END AS cancelled_qty
     FROM rpt.v_allocation_lines AS l
     LEFT JOIN ex ON ex.allocation_id = l.allocation_id
     WHERE l.created_at <= @as_of_time{where}
-), scored AS (
+), expiry AS (
     SELECT lines.*,
-           allocated_quantity - executed_qty - cancelled_qty AS remaining_qty,
-           CASE WHEN allocated_quantity - executed_qty - cancelled_qty > 0
+           CASE WHEN expires_at IS NOT NULL AND @as_of_time >= expires_at AND allocated_quantity - executed_qty - cancelled_qty > 0
+                THEN allocated_quantity - executed_qty - cancelled_qty ELSE 0 END AS expired_qty
+    FROM lines
+), scored AS (
+    SELECT expiry.*,
+           allocated_quantity - executed_qty - cancelled_qty - expired_qty AS remaining_qty,
+           CASE WHEN allocated_quantity - executed_qty - cancelled_qty - expired_qty > 0
                 THEN CASE WHEN executed_qty > 0 THEN N'Partially filled' ELSE N'Working' END
+                WHEN expired_qty > 0 THEN N'Expired'
                 WHEN cancelled_qty > 0 THEN N'Remainder cancelled'
                 ELSE N'Filled' END AS line_status
-    FROM lines
+    FROM expiry
 )
+""";
+        var sql = ctes + $"""
 SELECT {cols},
        SUM(allocated_quantity) AS allocated_qty,
        SUM(executed_qty) AS executed_qty,
        SUM(cancelled_qty) AS cancelled_qty,
+       SUM(expired_qty) AS expired_qty,
        SUM(remaining_qty) AS remaining_qty,
        CASE WHEN MIN(line_status) = MAX(line_status) THEN MIN(line_status) ELSE N'Mixed' END AS order_status,
        COUNT(*) AS allocation_count
 FROM scored
-WHERE {(q.Status == "open" ? "remaining_qty > 0" : "1 = 1")}
+WHERE {status}
 GROUP BY {cols}
 ORDER BY {cols};
 """;
-        return new(sql, p, null, groups.Select(g => g.Key).ToList());
+        var detail = ctes + $"""
+SELECT allocation_id, block_id, side, symbol, account_number, custodian, time_in_force,
+       allocated_quantity AS allocated_qty, executed_qty, cancelled_qty, expired_qty, remaining_qty, line_status
+FROM scored
+WHERE {status}
+ORDER BY account_number, symbol, allocation_id;
+""";
+        return new(sql, p, detail, groups.Select(g => g.Key).ToList());
     }
 }

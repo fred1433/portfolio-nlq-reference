@@ -28,7 +28,7 @@ public sealed class DimensionOut { public string? Type { get; set; } public stri
 public sealed class ThresholdOut { public string? Direction { get; set; } public decimal? Points { get; set; } }
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed class DateOut { public string? Date { get; set; } public int? Month { get; set; } public int? Day { get; set; } public string? Relative { get; set; } }
+public sealed class DateOut { public string? Date { get; set; } public int? Month { get; set; } public int? Day { get; set; } public string? Relative { get; set; } public string? Time { get; set; } }
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed class FilterOut { public string? Field { get; set; } public string? Value { get; set; } }

@@ -35,9 +35,10 @@ public static class SessionScope
                 throw new ScopeException($"tenant scope could not be verified (read back {pinned ?? "null"})");
             return conn;
         }
-        catch (Exception e) when (e is not OperationCanceledException)
+        catch (Exception e)
         {
-            await conn.DisposeAsync();
+            await conn.DisposeAsync(); // released on every unsuccessful exit, cancellation included
+            if (e is OperationCanceledException) throw;
             throw e as ScopeException ?? new ScopeException("tenant scope could not be set: " + e.Message, e);
         }
     }

@@ -41,8 +41,11 @@ CREATE VIEW rpt.v_close_dates AS
 SELECT DISTINCT price_date AS close_date FROM dbo.price;
 GO
 
+-- expires_at: a DAY block's unfilled remainder expires at its market's close (USD 15:00, EUR 10:30, America/Chicago).
 CREATE VIEW rpt.v_allocation_lines AS
-SELECT al.allocation_id, al.block_id, b.side, b.trade_date, b.created_at,
+SELECT al.allocation_id, al.block_id, b.side, b.trade_date, b.created_at, b.time_in_force,
+       CASE WHEN b.time_in_force = 'DAY'
+            THEN DATEADD(minute, CASE WHEN s.currency = 'EUR' THEN 630 ELSE 900 END, CAST(b.trade_date AS datetime2(0))) END AS expires_at,
        s.security_id, s.symbol, s.name AS security_name, s.asset_class,
        a.account_id, a.account_number, a.name AS account_name, a.household_id,
        a.custodian_id, c.name AS custodian,

@@ -9,7 +9,7 @@ namespace PortfolioNlq.Catalog;
 /// </summary>
 public static class PromptBuilder
 {
-    public const string Version = "prompt-v2";
+    public const string Version = "prompt-v3";
 
     public static string SystemPrompt() => $$"""
 You translate a portfolio manager's question into one JSON object. You never write SQL and never compute numbers or dates.
@@ -23,7 +23,7 @@ Shape:
   "threshold": { "direction": "above" | "below" | "either", "points": number },
   "group_by": [string],
   "date_basis": "trade" | "settlement",
-  "as_of": { "date": "YYYY-MM-DD" } | { "month": int, "day": int } | { "relative": string },
+  "as_of": { "date": "YYYY-MM-DD" } | { "month": int, "day": int } | { "relative": string }, optionally with "time": "HH:mm" (24h) for open_allocations,
   "side": "buy" | "sell",
   "asset_class": string,
   "status": "open" | "all",
@@ -42,7 +42,8 @@ Measures:
   filters on {{string.Join(", ", QueryCatalog.AllocationFilters)}}. A fund is an account.
 
 Dates: copy what the user said. Use "relative" with one of {{string.Join(", ", QueryCatalog.Relative)}} ("Tuesday's close" = "tuesday", "last Friday" = "last_friday", "yesterday" = "yesterday").
-Use "month"/"day" when the year is not stated. Leave "as_of" out when no date is mentioned.
+Use "month"/"day" when the year is not stated. Leave "as_of" out when no date is mentioned. Add "time" only when the user gives a time of day for orders.
+Thresholds: copy the number of points exactly as the user wrote it.
 
 Filters: copy names as the user wrote them (account names, account numbers, household names, custodians, model names, tickers). Use "household" when the user says household or family group.
 

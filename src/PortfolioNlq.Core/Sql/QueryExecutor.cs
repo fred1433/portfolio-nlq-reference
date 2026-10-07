@@ -115,11 +115,20 @@ public sealed class ScopedQueryExecutor(string connectionString, ExecutorOptions
             "int" => new SqlParameter(p.Name, SqlDbType.Int) { Value = int.Parse(p.Value, CultureInfo.InvariantCulture) },
             "date" => new SqlParameter(p.Name, SqlDbType.Date) { Value = DateTime.ParseExact(p.Value, "yyyy-MM-dd", CultureInfo.InvariantCulture) },
             "datetime2" => new SqlParameter(p.Name, SqlDbType.DateTime2) { Scale = 0, Value = DateTime.ParseExact(p.Value, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) },
-            "decimal" => new SqlParameter(p.Name, SqlDbType.Decimal) { Precision = 9, Scale = 4, Value = decimal.Parse(p.Value, CultureInfo.InvariantCulture) },
+            "decimal" => DecimalParameter(p),
             "varchar" => new SqlParameter(p.Name, SqlDbType.VarChar, Size(p.SqlType)) { Value = p.Value },
             "nvarchar" => new SqlParameter(p.Name, SqlDbType.NVarChar, Size(p.SqlType)) { Value = p.Value },
             _ => throw new InvalidOperationException("parameter type " + p.SqlType),
         };
+    }
+
+    /// <summary>decimal(9,4) only, and only for values that fit it exactly: SqlClient would otherwise round silently.</summary>
+    static SqlParameter DecimalParameter(QueryParameter p)
+    {
+        var v = decimal.Parse(p.Value, CultureInfo.InvariantCulture);
+        if (p.SqlType != "decimal(9,4)") throw new ArgumentException($"{p.Name}: unsupported type {p.SqlType}");
+        if (v != Math.Round(v, 4) || Math.Abs(v) >= 100000m) throw new ArgumentException($"{p.Name}: {p.Value} does not fit decimal(9,4) exactly");
+        return new SqlParameter(p.Name, SqlDbType.Decimal) { Precision = 9, Scale = 4, Value = v };
     }
 
     static int Size(string t) => int.Parse(t.Split('(', ')')[1], CultureInfo.InvariantCulture);

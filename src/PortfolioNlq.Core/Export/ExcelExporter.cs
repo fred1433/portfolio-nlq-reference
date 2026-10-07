@@ -19,10 +19,11 @@ public static class ExcelExporter
         ["row_status"] = ("Status", "@"), ["missing_detail"] = ("Why incomplete", "@"),
         ["symbol"] = ("Security", "@"), ["security_name"] = ("Security name", "@"), ["block_id"] = ("Block", "0"), ["side"] = ("Side", "@"),
         ["allocated_qty"] = ("Allocated (units)", "#,##0"), ["executed_qty"] = ("Executed (units)", "#,##0"),
-        ["cancelled_qty"] = ("Cancelled (units)", "#,##0"), ["remaining_qty"] = ("Remaining (units)", "#,##0"),
+        ["cancelled_qty"] = ("Cancelled (units)", "#,##0"), ["remaining_qty"] = ("Remaining (units)", "#,##0"), ["expired_qty"] = ("Expired (units)", "#,##0"),
+        ["allocation_id"] = ("Allocation", "0"), ["time_in_force"] = ("Time in force", "@"), ["line_status"] = ("Status", "@"),
         ["order_status"] = ("Order status", "@"), ["allocation_count"] = ("Allocations", "0"),
         ["quantity"] = ("Quantity", "#,##0.00"), ["currency"] = ("Currency", "@"), ["close_price"] = ("Close (local)", "#,##0.00"),
-        ["usd_per_unit"] = ("USD per unit", "0.0000"), ["market_value_usd"] = ("Market value (USD)", "#,##0.00"),
+        ["usd_per_unit"] = ("FX (USD per currency unit)", "0.0000"), ["market_value_usd"] = ("Market value (USD)", "#,##0.00"),
         ["contribution_pct"] = ("Share of account (%)", "0.00"), ["missing_reason"] = ("Missing", "@"),
     };
 

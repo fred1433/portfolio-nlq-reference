@@ -1,0 +1,17 @@
+{
+  "rule": "One version names one rendered prompt, catalog definitions included. When the rendered text changes, the version changes.",
+  "versions": [
+    { "version": "prompt-v1", "sha256": "4916b6037a735dbb3e20fd64de661c3bc55cb0ba059cbe8a2d360deac6bbd72b", "recordings": ["rec-2026-10-07-r1"] },
+    { "version": "prompt-v2", "sha256": "834c356e5a5573794aaa7d403632030e733c93cfe82b2cc5a9eb968d7e3f08e9", "recordings": ["rec-2026-10-07-r2"] },
+    { "version": "prompt-v2.1", "sha256": "d2cb0a551c0fa713b26f41d0d3da311d848e3910dfbe6ba4a5fb4f69c6eee30a", "recordings": ["rec-2026-10-07-r3"] },
+    { "version": "prompt-v3", "sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32" }
+  ],
+  "corrections": [
+    {
+      "recording": "rec-2026-10-07-r3",
+      "labelled": "prompt-v2",
+      "actual_sha256": "d2cb0a551c0fa713b26f41d0d3da311d848e3910dfbe6ba4a5fb4f69c6eee30a",
+      "note": "Recording r3 used a revised order definition covering time in force and the Chicago time zone. Its prompt hash differs from r2. It was labelled prompt-v2 by mistake and is registered here as prompt-v2.1; its manifest is left as recorded."
+    }
+  ]
+}
