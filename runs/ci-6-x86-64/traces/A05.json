@@ -1,0 +1,228 @@
+{
+  "run_id": "ci-6-x86-64",
+  "case_id": "A05",
+  "question": "Show equity drift by household as of 10/6, for households more than 2 points off target in either direction.",
+  "outcome": "answered",
+  "outcome_message": null,
+  "outcome_source": "validator",
+  "error_category": null,
+  "tenant_id": 1,
+  "user_id": "demo-user-tenant-1",
+  "scope": "tenant 1, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r4",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T15:09:01Z",
+    "model_duration_ms": 3076,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v3",
+    "prompt_sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32",
+    "user_message": "Question: Show equity drift by household as of 10/6, for households more than 2 points off target in either direction.",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"drift\",\"dimension\":{\"type\":\"asset_class\",\"value\":\"Equity\"},\"threshold\":{\"direction\":\"either\",\"points\":2},\"group_by\":[\"household\"],\"as_of\":{\"month\":10,\"day\":6}}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "drift",
+    "dimension": {
+      "type": "asset_class",
+      "value": "Equity"
+    },
+    "threshold": {
+      "direction": "either",
+      "points": 2
+    },
+    "group_by": [
+      "household"
+    ],
+    "date_basis": null,
+    "as_of": {
+      "date": null,
+      "month": 10,
+      "day": 6,
+      "relative": null,
+      "time": null
+    },
+    "side": null,
+    "asset_class": null,
+    "status": null,
+    "filters": null,
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": {
+    "measure": "drift",
+    "dimension_type": "asset_class",
+    "dimension_value": "Equity",
+    "threshold_direction": "either",
+    "threshold_points": 2,
+    "group_by": [
+      "household"
+    ],
+    "date_basis": "trade",
+    "as_of": "2026-10-06",
+    "as_of_time": "2026-10-06T23:59:59",
+    "side": null,
+    "asset_class": null,
+    "status": "n/a",
+    "filters": [],
+    "defaults_applied": [
+      "reporting currency USD",
+      "dates and timestamps in America/Chicago",
+      "trade-date positions"
+    ],
+    "definition": "Household weight = sum of the sleeve's market value / sum of account market values, cash included, USD at the as-of close. Household target = sum over its accounts of (account target x account value) / sum of account values, so larger accounts weigh more. Drift = weight minus target, in percentage points. One incomplete account makes the household incomplete."
+  },
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 1",
+  "versions": {
+    "catalog": "catalog-2026.10.2",
+    "compiler": "compiler-2026.10.4",
+    "schema": "schema-5f7277d19eb7",
+    "prompt": "prompt-v3 sha256 5c94aa00ea14",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-ab02a59d4fd2",
+    "sha256": "ab02a59d4fd2ce6a86ae0bc27fe364ce33fe8bc0a54af56d6b2b8a46be0075e6"
+  },
+  "sql": "WITH dim AS (\n    SELECT s.security_id FROM rpt.v_securities AS s WHERE s.asset_class = @dimension_value\n), acct AS (\n    SELECT a.account_id, a.account_number, a.household_id, a.household\n    FROM rpt.v_accounts AS a\n    WHERE a.household_id IS NOT NULL\n), pos AS (\n    SELECT p.account_id, p.security_id, p.market_value_usd, p.missing_reason\n    FROM rpt.fn_positions(@as_of, @basis) AS p\n), tgt AS (\n    SELECT t.account_id, SUM(t.target_weight) AS target_weight\n    FROM rpt.fn_account_targets() AS t\n    WHERE t.security_id IN (SELECT security_id FROM dim)\n    GROUP BY t.account_id\n), per_account AS (\n    SELECT acct.account_id, acct.account_number, acct.household_id, acct.household,\n           SUM(pos.market_value_usd) AS total_mv_usd,\n           SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,\n           STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail\n    FROM acct\n    LEFT JOIN pos ON pos.account_id = acct.account_id\n    LEFT JOIN dim ON dim.security_id = pos.security_id\n    GROUP BY acct.account_id, acct.account_number, acct.household_id, acct.household\n), hh AS (\n    SELECT pa.household,\n           COUNT(*) AS account_count,\n           SUM(pa.total_mv_usd) AS total_mv_usd,\n           SUM(pa.dim_mv_usd) AS dim_mv_usd,\n           SUM(COALESCE(tgt.target_weight, 0) * pa.total_mv_usd) AS target_mv_usd,\n           STRING_AGG(pa.missing_detail, N'; ') AS missing_detail\n    FROM per_account AS pa\n    LEFT JOIN tgt ON tgt.account_id = pa.account_id\n    GROUP BY pa.household_id, pa.household\n), scored AS (\n    SELECT household, account_count, total_mv_usd, missing_detail,\n           CASE WHEN missing_detail IS NOT NULL THEN 'Incomplete' WHEN COALESCE(total_mv_usd, 0) = 0 THEN 'No valuation' ELSE 'Complete' END AS row_status,\n           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0\n                THEN CAST(dim_mv_usd AS decimal(20,6)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS weight_pct,\n           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0\n                THEN CAST(target_mv_usd AS decimal(24,10)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS target_pct\n    FROM hh\n)SELECT household, account_count,\n       CASE WHEN row_status = 'Complete' THEN total_mv_usd END AS total_mv_usd,\n       weight_pct, target_pct, weight_pct - target_pct AS drift_pts,\n       row_status, missing_detail\nFROM scored\nWHERE row_status <> 'Complete' OR ABS(weight_pct - target_pct) > @threshold_points\nORDER BY CASE WHEN row_status = 'Complete' THEN 0 ELSE 1 END, weight_pct - target_pct DESC, household;",
+  "detail_sql": "WITH dim AS (\n    SELECT s.security_id FROM rpt.v_securities AS s WHERE s.asset_class = @dimension_value\n), acct AS (\n    SELECT a.account_id, a.account_number, a.household_id, a.household\n    FROM rpt.v_accounts AS a\n    WHERE a.household_id IS NOT NULL\n), pos AS (\n    SELECT p.account_id, p.security_id, p.market_value_usd, p.missing_reason\n    FROM rpt.fn_positions(@as_of, @basis) AS p\n), tgt AS (\n    SELECT t.account_id, SUM(t.target_weight) AS target_weight\n    FROM rpt.fn_account_targets() AS t\n    WHERE t.security_id IN (SELECT security_id FROM dim)\n    GROUP BY t.account_id\n), per_account AS (\n    SELECT acct.account_id, acct.account_number, acct.household_id, acct.household,\n           SUM(pos.market_value_usd) AS total_mv_usd,\n           SUM(CASE WHEN dim.security_id IS NOT NULL THEN pos.market_value_usd ELSE 0 END) AS dim_mv_usd,\n           STRING_AGG(pos.missing_reason, N'; ') WITHIN GROUP (ORDER BY pos.missing_reason) AS missing_detail\n    FROM acct\n    LEFT JOIN pos ON pos.account_id = acct.account_id\n    LEFT JOIN dim ON dim.security_id = pos.security_id\n    GROUP BY acct.account_id, acct.account_number, acct.household_id, acct.household\n), hh AS (\n    SELECT pa.household,\n           COUNT(*) AS account_count,\n           SUM(pa.total_mv_usd) AS total_mv_usd,\n           SUM(pa.dim_mv_usd) AS dim_mv_usd,\n           SUM(COALESCE(tgt.target_weight, 0) * pa.total_mv_usd) AS target_mv_usd,\n           STRING_AGG(pa.missing_detail, N'; ') AS missing_detail\n    FROM per_account AS pa\n    LEFT JOIN tgt ON tgt.account_id = pa.account_id\n    GROUP BY pa.household_id, pa.household\n), scored AS (\n    SELECT household, account_count, total_mv_usd, missing_detail,\n           CASE WHEN missing_detail IS NOT NULL THEN 'Incomplete' WHEN COALESCE(total_mv_usd, 0) = 0 THEN 'No valuation' ELSE 'Complete' END AS row_status,\n           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0\n                THEN CAST(dim_mv_usd AS decimal(20,6)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS weight_pct,\n           CASE WHEN missing_detail IS NULL AND COALESCE(total_mv_usd, 0) <> 0\n                THEN CAST(target_mv_usd AS decimal(24,10)) * 100 / CAST(total_mv_usd AS decimal(20,6)) END AS target_pct\n    FROM hh\n)SELECT pa.household, pa.account_number,\n       CASE WHEN pa.missing_detail IS NULL THEN COALESCE(pa.total_mv_usd, 0) END AS total_mv_usd,\n       CASE WHEN pa.missing_detail IS NULL AND COALESCE(pa.total_mv_usd, 0) <> 0\n            THEN CAST(pa.dim_mv_usd AS decimal(20,6)) * 100 / CAST(pa.total_mv_usd AS decimal(20,6)) END AS weight_pct,\n       CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct\nFROM per_account AS pa\nLEFT JOIN tgt ON tgt.account_id = pa.account_id\nWHERE pa.household IN (SELECT household FROM scored WHERE row_status <> 'Complete' OR ABS(weight_pct - target_pct) > @threshold_points)\nORDER BY pa.household, pa.account_number;",
+  "parameters": [
+    {
+      "name": "@as_of",
+      "sql_type": "date",
+      "value": "2026-10-06"
+    },
+    {
+      "name": "@basis",
+      "sql_type": "varchar(10)",
+      "value": "trade"
+    },
+    {
+      "name": "@dimension_value",
+      "sql_type": "nvarchar(60)",
+      "value": "Equity"
+    },
+    {
+      "name": "@threshold_points",
+      "sql_type": "decimal(9,4)",
+      "value": "2"
+    }
+  ],
+  "key_columns": [
+    "household"
+  ],
+  "execution_status": "complete",
+  "execution_note": "3 row(s), complete.",
+  "columns": [
+    "household",
+    "account_count",
+    "total_mv_usd",
+    "weight_pct",
+    "target_pct",
+    "drift_pts",
+    "row_status",
+    "missing_detail"
+  ],
+  "rows": [
+    {
+      "household": "Brennan Family",
+      "account_count": "1",
+      "total_mv_usd": "3264032",
+      "weight_pct": "64.60774587994235",
+      "target_pct": "60",
+      "drift_pts": "4.60774587994235",
+      "row_status": "Complete",
+      "missing_detail": null
+    },
+    {
+      "household": "Whitfield Family",
+      "account_count": "2",
+      "total_mv_usd": "11021029.5",
+      "weight_pct": "78.44678212684214",
+      "target_pct": "75.75432766966098",
+      "drift_pts": "2.69245445718116",
+      "row_status": "Complete",
+      "missing_detail": null
+    },
+    {
+      "household": "Okafor Household",
+      "account_count": "2",
+      "total_mv_usd": "7721492",
+      "weight_pct": "78.7223894034987",
+      "target_pct": "76.2305212515923",
+      "drift_pts": "2.4918681519064",
+      "row_status": "Complete",
+      "missing_detail": null
+    }
+  ],
+  "detail_rows": [
+    {
+      "household": "Brennan Family",
+      "account_number": "LWP-1005",
+      "total_mv_usd": "3264032",
+      "weight_pct": "64.60774587994235",
+      "target_pct": "60"
+    },
+    {
+      "household": "Okafor Household",
+      "account_number": "LWP-1003",
+      "total_mv_usd": "6266192",
+      "weight_pct": "82.60610271756754",
+      "target_pct": "80"
+    },
+    {
+      "household": "Okafor Household",
+      "account_number": "LWP-1004",
+      "total_mv_usd": "1455300",
+      "weight_pct": "62",
+      "target_pct": "60"
+    },
+    {
+      "household": "Whitfield Family",
+      "account_number": "LWP-1001",
+      "total_mv_usd": "8681445.5",
+      "weight_pct": "83.10850998258296",
+      "target_pct": "80"
+    },
+    {
+      "household": "Whitfield Family",
+      "account_number": "LWP-1002",
+      "total_mv_usd": "2339584",
+      "weight_pct": "61.14860590600722",
+      "target_pct": "60"
+    }
+  ],
+  "durations_ms": {
+    "model": 3076,
+    "parse": 0,
+    "lookup": 4,
+    "validate": 0,
+    "compile": 0,
+    "execute": 13
+  },
+  "executed_at": "2026-10-07T15:19:31Z",
+  "executed_on": "Ubuntu 24.04.5 LTS X64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}
