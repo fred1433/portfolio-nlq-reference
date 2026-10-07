@@ -27,7 +27,7 @@ jobs:
           dotnet-version: |
             8.0.x
             10.0.x
-      - run: make sql
+      - run: make sql RUN_ID=ci-${{ github.run_number }}-x86-64
       - uses: actions/upload-artifact@v4
         if: always()
         with:

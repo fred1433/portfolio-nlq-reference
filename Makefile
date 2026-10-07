@@ -5,6 +5,7 @@ NLQ := $(DOTNET) run --project src/PortfolioNlq.Cli --no-build --
 PUBLISHED_RECORDING := $(word 1,$(shell cat runs/PUBLISHED))
 PUBLISHED_RUN := $(word 2,$(shell cat runs/PUBLISHED))
 PORT ?= 14333
+RUN_ID ?= local-$(shell date +%Y%m%d-%H%M%S)
 
 .PHONY: build verify sql test record expected clean-sql
 
@@ -29,7 +30,7 @@ sql: build .env
 	export NLQ_READER_CONNECTION="Server=localhost,$(PORT);Database=NlqReference;User ID=nlq_reader;Password=$$NLQ_READER_PASSWORD;TrustServerCertificate=True;Encrypt=True"; \
 	$(NLQ) db-setup && \
 	$(DOTNET) test tests/PortfolioNlq.SqlTests --no-build -nologo --logger "console;verbosity=normal" && \
-	$(NLQ) replay --recording $(PUBLISHED_RECORDING) --run-id local-$$(date +%Y%m%d-%H%M%S) --out runs/local-latest --sql && \
+	$(NLQ) replay --recording $(PUBLISHED_RECORDING) --run-id $(RUN_ID) --out runs/local-latest --sql && \
 	$(NLQ) compare --a $(PUBLISHED_RUN) --b runs/local-latest
 
 test: verify sql
