@@ -1,0 +1,96 @@
+{
+  "run_id": "run-2026-10-07-r4-local",
+  "case_id": "C04",
+  "question": "Show the open allocations for the Okafor account.",
+  "outcome": "clarify",
+  "outcome_message": "'Okafor' matches 2 account records: Okafor Joint (LWP-1003), Okafor Roth IRA (LWP-1004). Which one?",
+  "outcome_source": "validator",
+  "error_category": null,
+  "tenant_id": 1,
+  "user_id": "demo-user-tenant-1",
+  "scope": "tenant 1, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r4",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T15:10:03Z",
+    "model_duration_ms": 3001,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v3",
+    "prompt_sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32",
+    "user_message": "Question: Show the open allocations for the Okafor account.",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"filters\":[{\"field\":\"account\",\"value\":\"Okafor\"}]}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "open_allocations",
+    "dimension": null,
+    "threshold": null,
+    "group_by": null,
+    "date_basis": null,
+    "as_of": null,
+    "side": null,
+    "asset_class": null,
+    "status": null,
+    "filters": [
+      {
+        "field": "account",
+        "value": "Okafor"
+      }
+    ],
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": null,
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 1",
+  "versions": {
+    "catalog": "catalog-2026.10.2",
+    "compiler": "compiler-2026.10.4",
+    "schema": "schema-5f7277d19eb7",
+    "prompt": "prompt-v3 sha256 5c94aa00ea14",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-ab02a59d4fd2",
+    "sha256": "ab02a59d4fd2ce6a86ae0bc27fe364ce33fe8bc0a54af56d6b2b8a46be0075e6"
+  },
+  "sql": null,
+  "detail_sql": null,
+  "parameters": [],
+  "key_columns": [],
+  "execution_status": "not executed",
+  "execution_note": null,
+  "columns": [],
+  "rows": [],
+  "detail_rows": [],
+  "durations_ms": {
+    "model": 3001,
+    "parse": 0,
+    "lookup": 34,
+    "validate": 0
+  },
+  "executed_at": "2026-10-07T15:10:52Z",
+  "executed_on": "macOS 27.0.1 Arm64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

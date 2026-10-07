@@ -1,0 +1,32 @@
+{
+  "recording_id": "rec-2026-10-07-r4",
+  "created_at": "2026-10-07T15:08:47Z",
+  "provider": "claude-cli",
+  "cli_version": "2.1.292 (Claude Code)",
+  "model_requested": "sonnet",
+  "flags": [
+    "-p",
+    "--output-format",
+    "json",
+    "--model",
+    "sonnet",
+    "--system-prompt",
+    "<system_prompt.txt>",
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--setting-sources",
+    "",
+    "--disable-slash-commands",
+    "--no-session-persistence"
+  ],
+  "prompt_version": "prompt-v3",
+  "prompt_sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32",
+  "system_prompt_file": "system_prompt.txt",
+  "expected_results_in_context": false,
+  "cases_sha256": "12381584d5d79d5e3d2d1f15fd9c38838a34c864b287580f5023bce6625c1fe7",
+  "retry_rule": "retry only when the CLI exits non-zero or times out (max 3 attempts); a reply that does not parse is kept and graded as is",
+  "note": "Fourth recording, prompt-v3 (adds a time of day for orders and the revised definitions). Expected results for 30 cases were recomputed and committed before these calls."
+}

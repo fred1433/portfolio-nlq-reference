@@ -1,0 +1,231 @@
+{
+  "run_id": "run-2026-10-07-r4-local",
+  "case_id": "B04",
+  "question": "Which sell allocations for the Halyard Creek Offshore fund are still open?",
+  "outcome": "answered",
+  "outcome_message": null,
+  "outcome_source": "validator",
+  "error_category": null,
+  "tenant_id": 2,
+  "user_id": "demo-user-tenant-2",
+  "scope": "tenant 2, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r4",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T15:09:30Z",
+    "model_duration_ms": 2668,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v3",
+    "prompt_sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32",
+    "user_message": "Question: Which sell allocations for the Halyard Creek Offshore fund are still open?",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"side\":\"sell\",\"status\":\"open\",\"filters\":[{\"field\":\"account\",\"value\":\"Halyard Creek Offshore\"}]}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "open_allocations",
+    "dimension": null,
+    "threshold": null,
+    "group_by": null,
+    "date_basis": null,
+    "as_of": null,
+    "side": "sell",
+    "asset_class": null,
+    "status": "open",
+    "filters": [
+      {
+        "field": "account",
+        "value": "Halyard Creek Offshore"
+      }
+    ],
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": {
+    "measure": "open_allocations",
+    "dimension_type": null,
+    "dimension_value": null,
+    "threshold_direction": null,
+    "threshold_points": null,
+    "group_by": [
+      "account",
+      "security",
+      "custodian"
+    ],
+    "date_basis": "n/a",
+    "as_of": null,
+    "as_of_time": "2026-10-07T09:00:00",
+    "side": "Sell",
+    "asset_class": null,
+    "status": "open",
+    "filters": [
+      {
+        "field": "account",
+        "input": "Halyard Creek Offshore",
+        "ids": [
+          202
+        ],
+        "matched": [
+          "Halyard Creek Offshore Ltd (HCC-2002)"
+        ]
+      }
+    ],
+    "defaults_applied": [
+      "reporting currency USD",
+      "dates and timestamps in America/Chicago",
+      "one row per account, security and custodian",
+      "order book as at the reference time 2026-10-07 09:00 America/Chicago"
+    ],
+    "definition": "Per allocation of a block order: allocated quantity, executed quantity (sum of fills up to the as-of time), cancelled quantity, remaining = allocated - executed - cancelled - expired. Open means remaining above zero. Quantities in whole shares or units; no prices involved. Blocks are good-till-cancelled unless marked DAY; a DAY remainder expires at its market's close (15:00 for USD, 10:30 for EUR). Fills, cancellations and expiries count only up to the as-of time. Timestamps are America/Chicago. Rows always keep security and side, so different securities or directions are never added together."
+  },
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 2",
+  "versions": {
+    "catalog": "catalog-2026.10.2",
+    "compiler": "compiler-2026.10.4",
+    "schema": "schema-5f7277d19eb7",
+    "prompt": "prompt-v3 sha256 5c94aa00ea14",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-ab02a59d4fd2",
+    "sha256": "ab02a59d4fd2ce6a86ae0bc27fe364ce33fe8bc0a54af56d6b2b8a46be0075e6"
+  },
+  "sql": "WITH ex AS (\n    SELECT e.allocation_id, SUM(e.quantity) AS executed_qty\n    FROM rpt.v_executions AS e\n    WHERE e.executed_at <= @as_of_time\n    GROUP BY e.allocation_id\n), lines AS (\n    SELECT l.allocation_id, l.block_id, l.side, l.time_in_force, l.expires_at, l.symbol, l.security_name,\n           l.account_number, l.account_name, l.custodian,\n           l.allocated_quantity,\n           COALESCE(ex.executed_qty, 0) AS executed_qty,\n           CASE WHEN l.cancelled_at <= @as_of_time THEN l.cancelled_quantity ELSE 0 END AS cancelled_qty\n    FROM rpt.v_allocation_lines AS l\n    LEFT JOIN ex ON ex.allocation_id = l.allocation_id\n    WHERE l.created_at <= @as_of_time\n      AND l.side = @side\n      AND l.account_id IN (@account_0)\n), expiry AS (\n    SELECT lines.*,\n           CASE WHEN expires_at IS NOT NULL AND @as_of_time >= expires_at AND allocated_quantity - executed_qty - cancelled_qty > 0\n                THEN allocated_quantity - executed_qty - cancelled_qty ELSE 0 END AS expired_qty\n    FROM lines\n), scored AS (\n    SELECT expiry.*,\n           allocated_quantity - executed_qty - cancelled_qty - expired_qty AS remaining_qty,\n           CASE WHEN allocated_quantity - executed_qty - cancelled_qty - expired_qty > 0\n                THEN CASE WHEN executed_qty > 0 THEN N'Partially filled' ELSE N'Working' END\n                WHEN expired_qty > 0 THEN N'Expired'\n                WHEN cancelled_qty > 0 THEN N'Remainder cancelled'\n                ELSE N'Filled' END AS line_status\n    FROM expiry\n)SELECT account_number, account_name, custodian, symbol, security_name, side,\n       SUM(allocated_quantity) AS allocated_qty,\n       SUM(executed_qty) AS executed_qty,\n       SUM(cancelled_qty) AS cancelled_qty,\n       SUM(expired_qty) AS expired_qty,\n       SUM(remaining_qty) AS remaining_qty,\n       CASE WHEN MIN(line_status) = MAX(line_status) THEN MIN(line_status) ELSE N'Mixed' END AS order_status,\n       COUNT(*) AS allocation_count\nFROM scored\nWHERE remaining_qty > 0\nGROUP BY account_number, account_name, custodian, symbol, security_name, side\nORDER BY account_number, account_name, custodian, symbol, security_name, side;",
+  "detail_sql": "WITH ex AS (\n    SELECT e.allocation_id, SUM(e.quantity) AS executed_qty\n    FROM rpt.v_executions AS e\n    WHERE e.executed_at <= @as_of_time\n    GROUP BY e.allocation_id\n), lines AS (\n    SELECT l.allocation_id, l.block_id, l.side, l.time_in_force, l.expires_at, l.symbol, l.security_name,\n           l.account_number, l.account_name, l.custodian,\n           l.allocated_quantity,\n           COALESCE(ex.executed_qty, 0) AS executed_qty,\n           CASE WHEN l.cancelled_at <= @as_of_time THEN l.cancelled_quantity ELSE 0 END AS cancelled_qty\n    FROM rpt.v_allocation_lines AS l\n    LEFT JOIN ex ON ex.allocation_id = l.allocation_id\n    WHERE l.created_at <= @as_of_time\n      AND l.side = @side\n      AND l.account_id IN (@account_0)\n), expiry AS (\n    SELECT lines.*,\n           CASE WHEN expires_at IS NOT NULL AND @as_of_time >= expires_at AND allocated_quantity - executed_qty - cancelled_qty > 0\n                THEN allocated_quantity - executed_qty - cancelled_qty ELSE 0 END AS expired_qty\n    FROM lines\n), scored AS (\n    SELECT expiry.*,\n           allocated_quantity - executed_qty - cancelled_qty - expired_qty AS remaining_qty,\n           CASE WHEN allocated_quantity - executed_qty - cancelled_qty - expired_qty > 0\n                THEN CASE WHEN executed_qty > 0 THEN N'Partially filled' ELSE N'Working' END\n                WHEN expired_qty > 0 THEN N'Expired'\n                WHEN cancelled_qty > 0 THEN N'Remainder cancelled'\n                ELSE N'Filled' END AS line_status\n    FROM expiry\n)SELECT allocation_id, block_id, side, symbol, account_number, custodian, time_in_force,\n       allocated_quantity AS allocated_qty, executed_qty, cancelled_qty, expired_qty, remaining_qty, line_status\nFROM scored\nWHERE remaining_qty > 0\nORDER BY account_number, symbol, allocation_id;",
+  "parameters": [
+    {
+      "name": "@as_of_time",
+      "sql_type": "datetime2(0)",
+      "value": "2026-10-07T09:00:00"
+    },
+    {
+      "name": "@side",
+      "sql_type": "varchar(4)",
+      "value": "Sell"
+    },
+    {
+      "name": "@account_0",
+      "sql_type": "int",
+      "value": "202"
+    }
+  ],
+  "key_columns": [
+    "account_number",
+    "custodian",
+    "symbol",
+    "side"
+  ],
+  "execution_status": "complete",
+  "execution_note": "2 row(s), complete.",
+  "columns": [
+    "account_number",
+    "account_name",
+    "custodian",
+    "symbol",
+    "security_name",
+    "side",
+    "allocated_qty",
+    "executed_qty",
+    "cancelled_qty",
+    "expired_qty",
+    "remaining_qty",
+    "order_status",
+    "allocation_count"
+  ],
+  "rows": [
+    {
+      "account_number": "HCC-2002",
+      "account_name": "Halyard Creek Offshore Ltd",
+      "custodian": "Northern Trust",
+      "symbol": "USLC",
+      "security_name": "US Large Cap Equity ETF",
+      "side": "Sell",
+      "allocated_qty": "400",
+      "executed_qty": "250",
+      "cancelled_qty": "0",
+      "expired_qty": "0",
+      "remaining_qty": "150",
+      "order_status": "Partially filled",
+      "allocation_count": "1"
+    },
+    {
+      "account_number": "HCC-2002",
+      "account_name": "Halyard Creek Offshore Ltd",
+      "custodian": "Northern Trust",
+      "symbol": "VNTB",
+      "security_name": "Vantaa Bank Oyj",
+      "side": "Sell",
+      "allocated_qty": "500",
+      "executed_qty": "0",
+      "cancelled_qty": "0",
+      "expired_qty": "0",
+      "remaining_qty": "500",
+      "order_status": "Working",
+      "allocation_count": "1"
+    }
+  ],
+  "detail_rows": [
+    {
+      "allocation_id": "9052",
+      "block_id": "905",
+      "side": "Sell",
+      "symbol": "USLC",
+      "account_number": "HCC-2002",
+      "custodian": "Northern Trust",
+      "time_in_force": "GTC",
+      "allocated_qty": "400",
+      "executed_qty": "250",
+      "cancelled_qty": "0",
+      "expired_qty": "0",
+      "remaining_qty": "150",
+      "line_status": "Partially filled"
+    },
+    {
+      "allocation_id": "9061",
+      "block_id": "906",
+      "side": "Sell",
+      "symbol": "VNTB",
+      "account_number": "HCC-2002",
+      "custodian": "Northern Trust",
+      "time_in_force": "GTC",
+      "allocated_qty": "500",
+      "executed_qty": "0",
+      "cancelled_qty": "0",
+      "expired_qty": "0",
+      "remaining_qty": "500",
+      "line_status": "Working"
+    }
+  ],
+  "durations_ms": {
+    "model": 2668,
+    "parse": 0,
+    "lookup": 24,
+    "validate": 0,
+    "compile": 0,
+    "execute": 57
+  },
+  "executed_at": "2026-10-07T15:10:52Z",
+  "executed_on": "macOS 27.0.1 Arm64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

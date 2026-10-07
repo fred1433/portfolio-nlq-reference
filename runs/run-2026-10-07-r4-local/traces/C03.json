@@ -1,0 +1,105 @@
+{
+  "run_id": "run-2026-10-07-r4-local",
+  "case_id": "C03",
+  "question": "Which accounts were more than 2 points above their equity target at the end of last month?",
+  "outcome": "clarify",
+  "outcome_message": "No closing prices are recorded for 2026-09-30 (Wednesday). Recorded closes: 2026-10-02, 2026-10-06. Which date should I use?",
+  "outcome_source": "validator",
+  "error_category": null,
+  "tenant_id": 1,
+  "user_id": "demo-user-tenant-1",
+  "scope": "tenant 1, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r4",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T15:10:00Z",
+    "model_duration_ms": 3213,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v3",
+    "prompt_sha256": "5c94aa00ea141588a6b55b49829eda29d706f2be6167fbeb5c6c9dff0b959d32",
+    "user_message": "Question: Which accounts were more than 2 points above their equity target at the end of last month?",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"drift\",\"dimension\":{\"type\":\"asset_class\",\"value\":\"Equity\"},\"threshold\":{\"direction\":\"above\",\"points\":2},\"group_by\":[\"account\"],\"as_of\":{\"relative\":\"previous_month_end\"}}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "drift",
+    "dimension": {
+      "type": "asset_class",
+      "value": "Equity"
+    },
+    "threshold": {
+      "direction": "above",
+      "points": 2
+    },
+    "group_by": [
+      "account"
+    ],
+    "date_basis": null,
+    "as_of": {
+      "date": null,
+      "month": null,
+      "day": null,
+      "relative": "previous_month_end",
+      "time": null
+    },
+    "side": null,
+    "asset_class": null,
+    "status": null,
+    "filters": null,
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": null,
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 1",
+  "versions": {
+    "catalog": "catalog-2026.10.2",
+    "compiler": "compiler-2026.10.4",
+    "schema": "schema-5f7277d19eb7",
+    "prompt": "prompt-v3 sha256 5c94aa00ea14",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-ab02a59d4fd2",
+    "sha256": "ab02a59d4fd2ce6a86ae0bc27fe364ce33fe8bc0a54af56d6b2b8a46be0075e6"
+  },
+  "sql": null,
+  "detail_sql": null,
+  "parameters": [],
+  "key_columns": [],
+  "execution_status": "not executed",
+  "execution_note": null,
+  "columns": [],
+  "rows": [],
+  "detail_rows": [],
+  "durations_ms": {
+    "model": 3213,
+    "parse": 0,
+    "lookup": 31,
+    "validate": 1
+  },
+  "executed_at": "2026-10-07T15:10:52Z",
+  "executed_on": "macOS 27.0.1 Arm64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

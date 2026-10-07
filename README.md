@@ -8,29 +8,29 @@
 
 | Command | Needs | What it proves |
 |---|---|---|
-| `make verify` | .NET 10 SDK. No Docker, no database, no key. | Fixture hash, expected results recomputed independently, every recorded model reply parsed, validated and compiled to the exact SQL and parameters of the published run, stored rows re-graded, 47 unit tests. Prints what it did **not** execute: SQL Server, row-level security, write denial. |
-| `make sql` | .NET 10 SDK, Docker. CI runs it on Linux x86-64; on Apple Silicon it works with the x86-64 image under emulation, outside CI. | SQL Server 2022 (image pinned by digest), 16 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
+| `make verify` | .NET 10 SDK. No Docker, no database, no key. | Fixture hash, expected results recomputed independently, every recorded model reply parsed, validated and compiled to the exact SQL and parameters of the published run, stored rows re-graded, 63 unit tests. Prints what it did **not** execute: SQL Server, row-level security, write denial. |
+| `make sql` | .NET 10 SDK, Docker. Supported and CI-tested on Linux x86-64. On Apple Silicon it was observed locally under emulation (the x86-64 image), which Microsoft does not support for SQL Server containers. | SQL Server 2022 (image pinned by digest), 21 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
 | `make record` | Claude Code logged in. | Re-records the model replies with `claude -p` on a subscription. Never run by tests or CI. |
 | `nlq ask` | Azure OpenAI endpoint, deployment, key or Entra ID. | A fresh call through `Microsoft.Extensions.AI`. Explicit only. Status: **compiled, not run against the provider.** |
 
-CI runs `make verify` and `make sql` on `ubuntu-24.04` (x86-64) at every push. Open `PortfolioNlq.slnx` in Visual Studio or Rider and debug `PortfolioNlq.Cli` with `replay --recording recordings/rec-2026-10-07-r3 --run-id debug --out runs/local-debug`.
+CI runs `make verify` and `make sql` on `ubuntu-24.04` (x86-64) at every push. Open `PortfolioNlq.slnx` in Visual Studio or Rider and debug `PortfolioNlq.Cli` with `replay --recording recordings/rec-2026-10-07-r4 --run-id debug --out runs/local-debug`.
 
 ## Published results
 
-Run `ci-4-x86-64` (GitHub Actions), recording `rec-2026-10-07-r3` (prompt-v2, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-ab02a59d4fd2`, SQL Server 2022 on Linux x86-64. 28 questions, graded against results computed beforehand by separate code. No single score:
+Run `RUNID` (GitHub Actions), recording `rec-2026-10-07-r4` (prompt-v3, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-ab02a59d4fd2`, SQL Server 2022 on Linux x86-64. 30 questions. Each is graded in two steps against a statement written for the case before any model call: first the reading (tenant, measure, sleeve, threshold and direction, grouping, filters, date and basis or order-book cutoff, outcome), then the result rows and the contributing lines, against results computed by separate code. No single score:
 
 | Category | Result |
 |---|---|
-| Answers | 15 of 15 correct, 0 wrong, 0 unjustified refusals |
+| Answers | 17 of 17 correct, 0 wrong, 0 unjustified refusals |
 | Clarifications needed | 4 of 4 asked, 0 guessed |
 | Refusals | 4 of 4 refused |
-| Authorization and adversarial | 5 of 5 held, 0 rows from another tenant |
+| Authorization and adversarial | no unauthorized data in 5 of 5; request handled correctly in 4 of 5 |
 
-Every case lists its checks (measure, as-of date, date basis, row identity, completeness, values) in `runs/ci-4-x86-64/summary.json`. One recording per prompt version: sampling variance was not measured. 28 cases is a reference, not a benchmark.
+The one failure is X05: asked from the fund manager about the other firm's accounts, the model read the firm's name as a custodian filter, so nothing came back. The database held the boundary; the reading was still wrong, and it is counted as a misread. Every case lists its checks in `runs/RUNID/summary.json`. Each recorded suite contains one sample per question; repeated-sampling variance was not measured. 30 cases is a reference, not a benchmark.
 
 **The loop that produced this.** Run 1 (`runs/run-2026-10-07-r1-local`, kept as recorded) failed 10 of 28: all 9 drift questions hit a SQL Server error in the compiled query (`Cannot perform an aggregate function on an expression containing an aggregate or a subquery`), and each answer said the query failed rather than showing an empty list; X02 was refused by the model instead of answered for the asking firm. Fixes: the dimension is now joined instead of tested with a subquery inside `SUM` (`compiler-2026.10.2`, guarded by a unit test), and prompt-v2 stops treating a mention of other firms as a reason to refuse. X02 is now a regression case; X05, a holdout whose run 1 output was read while writing the fix, is requalified as regression too. A named, injected defect (`>=` instead of `>` on the threshold) is also kept as a test: the evaluation flags Okafor Roth IRA, which sits at exactly +2.00.
 
-**Fixture correction, same day.** A review found the euro security named and settled like a Norwegian one, fills stamped after the US close, and a clock read without its time zone. The fixture was corrected (a euro-area issuer settling T+2, America/Chicago session times, a time in force on every block), the clock now converts to America/Chicago before taking a date, and `eval/expected.json` was recomputed and committed **before** the new model calls (recording r3, prompt unchanged). Runs 1 and 2 stay in `runs/` on the previous fixture. Each fix has a test that failed before it (`ReviewFixesTests`, `ReviewFixesSqlTests`).
+**Fixture correction and external review, same day.** A review found the euro security named and settled like a Norwegian one, fills stamped after the US close, and a clock read without its time zone; a second review found allocation rows that added two securities, a grader that could pass a wrong threshold or an error, a reference blind to order timing, and malformed replies that escaped without a trace. Each fix has a test that failed before it (`ReviewFixesTests`, `JudgeMutationTests` and their SQL counterparts). Recording r3 used a revised order definition covering time in force and the Chicago time zone. Its prompt hash differs from r2. The expected results were recomputed before the new model calls. Each recorded suite contains one sample per question; repeated-sampling variance was not measured. r3 had been labelled prompt-v2 by mistake: `recordings/prompt_versions.json` registers it as prompt-v2.1 and leaves its manifest as recorded. The current prompt is prompt-v3 (a time of day for orders, revised definitions); its expected results were committed before recording r4. Runs 1 to 3 stay in `runs/`.
 
 ## How a question becomes SQL
 
@@ -45,7 +45,19 @@ question -> model -> typed query (JSON) -> validator -> compiler -> parameterise
 
 The catalog is composable: drift takes an asset class or a tag, account or household grouping, filters by account, household, custodian or model, any recorded close, either date basis, and a threshold above, below or either way. Open allocations take side, asset class, open or all, filters, and any grouping by account, security, custodian or block.
 
-**Definitions.** Weight = market value of the sleeve / market value of the whole account, **cash included**, in USD at the as-of close. Target = the model's weight for the sleeve, multiplied down the model hierarchy. Drift = weight minus target, in points. A position with no close or no FX rate on the as-of date makes the account **incomplete**, listed with the reason, never valued at zero. Numbers are compared after rounding to 10 decimal places (half away from zero); traces keep every digit SQL Server returned; display rounds to 2.
+**Definitions.**
+
+| Term | Definition |
+|---|---|
+| Weight | Market value of the sleeve / market value of the whole account, **cash included**, USD at the as-of close. The latest close is the previous business day's, read at the morning reference time. |
+| Target | The model's weight for the sleeve, multiplied down the model hierarchy. Contributing lines list held sleeve positions and sleeve securities the model targets but the account does not hold, so targets reconcile. |
+| Drift | Weight minus target, in percentage points. Thresholds are strict and accepted to four decimal places; a finer threshold is asked back, never rounded. |
+| Household | Sum of sleeve values / sum of account values; target = sum of (account target x account value) / sum of account values. The component accounts are shown. |
+| Incomplete, no valuation | A position with no close or no FX rate makes the account incomplete, listed with the reason, never valued at zero. An account with nothing to value is "no valuation". |
+| FX | USD per unit of the security's currency, at the as-of date. |
+| Prices | Amounts per quantity unit. The credit note is held in units of one note, priced clean per note; accrued interest is ignored (a fixture simplification). |
+| Quantities | Whole shares or units for every security, enforced when the fixture loads; only cash carries cents. |
+| Allocations | Remaining = allocated - executed - cancelled - expired, counting only events up to the cutoff (a stated date means the end of that day, never after the reference time; a stated time is exact). A DAY remainder expires at its market's close (15:00 USD, 10:30 EUR, America/Chicago); GTC stays working. Rows always keep security and side; the contributing lines are the allocations themselves. | Numbers are compared after rounding to 10 decimal places (half away from zero); traces keep every digit SQL Server returned; display rounds to 2.
 
 **What it refuses.** Projected weights after orders fill (out of scope here), performance and returns, advice, any write (cancel, place, change), raw SQL, permission or tenant changes.
 
@@ -53,13 +65,13 @@ The catalog is composable: drift takes an asset class or a tag, account or house
 
 ## The audit trace
 
-Each answer writes `runs/<run>/traces/<case>.json`: question; typed query and resolved interpretation; effective scope; prompt version and hash, user message, raw model reply, model id, recording id and CLI flags; catalog, compiler and schema versions; SQL and typed parameters; fixture id and SHA-256; as-of date, basis and reference clock; rows exactly as returned, contributing lines; status (complete, truncated, timeout, cancelled, error); real durations. `nlq export --trace <file> --out answer.xlsx` writes a workbook from that stored trace without running anything again: a Result sheet with typed numbers and units, the contributing lines, and an Audit sheet. Text that a spreadsheet could read as a formula is written as text with a quote prefix.
+Each request writes `runs/<run>/traces/<case>.json`, failures included (provider, lookup, validation, execution or cancellation, with the stage, an error category and the duration): question; typed query and resolved interpretation; effective scope; prompt version and hash, user message, raw model reply, model id, recording id and CLI flags; catalog, compiler and schema versions; SQL and typed parameters; fixture id and SHA-256; as-of date, basis and reference clock; rows exactly as returned, contributing lines; status (complete, truncated, timeout, cancelled, error); real durations. `nlq export --trace <file> --out answer.xlsx` writes a workbook from that stored trace without running anything again: a Result sheet with typed numbers and units, the contributing lines, and an Audit sheet. Text that a spreadsheet could read as a formula is written as text with a quote prefix.
 
 The fixture is frozen and hashed (`fixture/*.csv`) instead of using temporal tables. Timestamps are America/Chicago; US securities settle T+1 and the euro-area security T+2; blocks carry a time in force (DAY or GTC). Reconstructing history in production (temporal tables, snapshots, or the application's own books of record) is an integration question.
 
 ## Database boundary
 
-`db/003_security.sql`: a row-level security policy filters every tenant table on `SESSION_CONTEXT(N'tenant_id')`. The application sets it from the authenticated user with `sp_set_session_context ... @read_only = 1` and stops if it cannot read it back (`Sql/SessionScope.cs`). The reporting login can `SELECT` on schema `rpt` and nothing else. Tested directly, with no model involved (`tests/PortfolioNlq.SqlTests`): authorized rows returned; the other tenant's rows excluded even when named; a missing identity fails the query (it does not return an empty answer); changing the context fails; a reused pooled connection (same SPID) keeps the right scope; aggregates and joins stay filtered; inserts, updates, deletes, reads of `dbo`, policy changes and DDL all fail; name lookup runs under the same scope. `ApplicationIntent=ReadOnly` routes to a readable replica; it is not treated as a guarantee of anything here.
+`db/003_security.sql`: a row-level security policy filters every tenant table on `SESSION_CONTEXT(N'tenant_id')`. The application sets it from the authenticated user with `sp_set_session_context ... @read_only = 1` and stops if it cannot read it back (`Sql/SessionScope.cs`); the connection is released on every unsuccessful exit, cancellation included. The reporting login can `SELECT` on schema `rpt` and nothing else. Tested directly, with no model involved (`tests/PortfolioNlq.SqlTests`): authorized rows returned; the other tenant's rows excluded even when named; a missing identity fails the query (it does not return an empty answer); changing the context fails; a reused pooled connection (same SPID) keeps the right scope; aggregates and joins stay filtered; inserts, updates, deletes, reads of `dbo`, policy changes and DDL all fail; name lookup runs under the same scope. `ApplicationIntent=ReadOnly` routes to a readable replica; it is not treated as a guarantee of anything here. Before production reuse of pooled sessions: Microsoft documents a SESSION_CONTEXT issue with parallel plans after a session is reset and reused, mitigated by trace flag 11042. The small fixture and the same-SPID pool test here do not exercise that condition; the integration should enable the mitigation or constrain parallelism for these queries, and test it.
 
 This is **tenant isolation**. Entitlements per account or per advisor inside a tenant are a second predicate on the same pattern, to be mapped to the client's own permission model.
 
