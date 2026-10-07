@@ -3,7 +3,7 @@ security_id,symbol,name,asset_class,currency
 2,USSC,US Small Cap Equity ETF,Equity,USD
 3,INTD,International Developed Equity ETF,Equity,USD
 4,ACMR,Acme Robotics Inc.,Equity,USD
-5,NRDB,Nordvik Bank ASA,Equity,EUR
+5,VNTB,Vantaa Bank Oyj,Equity,EUR
 6,AGGB,US Aggregate Bond ETF,Fixed Income,USD
 7,MNLD,Municipal Ladder 1-10Y ETF,Fixed Income,USD
 8,HCXN,Harbor Credit 7.25% 2031 Note,Fixed Income,USD

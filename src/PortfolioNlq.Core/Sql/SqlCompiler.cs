@@ -16,7 +16,7 @@ public sealed record CompiledQuery(string Sql, IReadOnlyList<QueryParameter> Par
 /// </summary>
 public static class SqlCompiler
 {
-    public const string Version = "compiler-2026.10.2";
+    public const string Version = "compiler-2026.10.3";
 
     public static CompiledQuery Compile(ResolvedQuery q) => q.Measure switch
     {
@@ -88,7 +88,7 @@ WITH dim AS (
     FROM rpt.fn_positions(@as_of, @basis) AS p
 )
 """;
-        var sql = head + $"""
+        var ctes = head + $"""
 , tgt AS (
     SELECT t.account_id, SUM(t.target_weight) AS target_weight
     FROM rpt.fn_account_targets() AS t
@@ -113,31 +113,39 @@ WITH dim AS (
     JOIN agg ON agg.account_id = acct.account_id
     LEFT JOIN tgt ON tgt.account_id = acct.account_id
 )
+""";
+        var keep = ThresholdClause(q, "weight_pct - target_pct");
+        var sql = ctes + $"""
 SELECT account_number, account_name, household, custodian, model,
        CASE WHEN missing_detail IS NULL THEN total_mv_usd END AS total_mv_usd,
        weight_pct, target_pct, weight_pct - target_pct AS drift_pts,
        CASE WHEN missing_detail IS NULL THEN 'Complete' ELSE 'Incomplete' END AS row_status,
        missing_detail
 FROM scored
-WHERE missing_detail IS NOT NULL OR {ThresholdClause(q, "weight_pct - target_pct")}
+WHERE missing_detail IS NOT NULL OR {keep}
 ORDER BY CASE WHEN missing_detail IS NULL THEN 0 ELSE 1 END, weight_pct - target_pct DESC, account_number;
 """;
-        var detail = head + """
-, tot AS (
+        // Lines behind the answer only: the same accounts as the result, plus the unpriced line of an incomplete account.
+        var detail = ctes + $"""
+, kept AS (
+    SELECT account_number, missing_detail FROM scored WHERE missing_detail IS NOT NULL OR {keep}
+), tot AS (
     SELECT pos.account_id, SUM(pos.market_value_usd) AS total_mv_usd FROM pos GROUP BY pos.account_id
-), tgt AS (
+), tgt_sec AS (
     SELECT t.account_id, t.security_id, t.target_weight FROM rpt.fn_account_targets() AS t
 )
 SELECT acct.account_number, p.symbol, p.security_name, p.quantity, p.currency, p.close_price, p.usd_per_unit,
        p.market_value_usd,
-       CAST(p.market_value_usd AS decimal(20,6)) * 100 / CAST(tot.total_mv_usd AS decimal(20,6)) AS contribution_pct,
-       CAST(COALESCE(tgt.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct,
+       CASE WHEN kept.missing_detail IS NULL
+            THEN CAST(p.market_value_usd AS decimal(20,6)) * 100 / CAST(tot.total_mv_usd AS decimal(20,6)) END AS contribution_pct,
+       CAST(COALESCE(tgt_sec.target_weight, 0) * 100 AS decimal(20,10)) AS target_pct,
        p.missing_reason
 FROM acct
+JOIN kept ON kept.account_number = acct.account_number
 JOIN rpt.fn_positions(@as_of, @basis) AS p ON p.account_id = acct.account_id
 JOIN tot ON tot.account_id = acct.account_id
-LEFT JOIN tgt ON tgt.account_id = acct.account_id AND tgt.security_id = p.security_id
-WHERE p.security_id IN (SELECT security_id FROM dim)
+LEFT JOIN tgt_sec ON tgt_sec.account_id = acct.account_id AND tgt_sec.security_id = p.security_id
+WHERE p.security_id IN (SELECT security_id FROM dim) OR p.missing_reason IS NOT NULL
 ORDER BY acct.account_number, p.market_value_usd DESC, p.symbol;
 """;
         return new(sql, p, detail, ["account_number"]);

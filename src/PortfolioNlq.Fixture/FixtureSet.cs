@@ -17,7 +17,7 @@ public sealed record Account(int AccountId, int TenantId, string AccountNumber, 
     int? HouseholdId, int CustodianId, int ModelId, string BaseCurrency);
 public sealed record OpeningPosition(int AccountId, int SecurityId, decimal Quantity, DateOnly AsOf);
 public sealed record BlockOrder(int BlockId, int TenantId, int SecurityId, string Side, decimal OrderQuantity,
-    DateOnly TradeDate, DateTime CreatedAt, string Status);
+    DateOnly TradeDate, DateTime CreatedAt, string Status, string TimeInForce);
 public sealed record Allocation(int AllocationId, int BlockId, int AccountId, decimal AllocatedQuantity,
     decimal CancelledQuantity, DateTime? CancelledAt);
 public sealed record Execution(int ExecutionId, int AllocationId, decimal Quantity, decimal Price, DateTime ExecutedAt);
@@ -74,7 +74,7 @@ public sealed record FixtureSet
                 NI(r, "household_id"), I(r, "custodian_id"), I(r, "model_id"), r["base_currency"])).ToList(),
             OpeningPositions = tables["opening_positions.csv"].Select(r => new OpeningPosition(I(r, "account_id"), I(r, "security_id"), M(r, "quantity"), Dt(r, "as_of"))).ToList(),
             BlockOrders = tables["block_orders.csv"].Select(r => new BlockOrder(I(r, "block_id"), I(r, "tenant_id"), I(r, "security_id"), r["side"], M(r, "order_quantity"),
-                Dt(r, "trade_date"), Ts(r["created_at"])!.Value, r["status"])).ToList(),
+                Dt(r, "trade_date"), Ts(r["created_at"])!.Value, r["status"], r["time_in_force"])).ToList(),
             Allocations = tables["allocations.csv"].Select(r => new Allocation(I(r, "allocation_id"), I(r, "block_id"), I(r, "account_id"), M(r, "allocated_quantity"),
                 M(r, "cancelled_quantity"), Ts(r["cancelled_at"]))).ToList(),
             Executions = tables["executions.csv"].Select(r => new Execution(I(r, "execution_id"), I(r, "allocation_id"), M(r, "quantity"), M(r, "price"), Ts(r["executed_at"])!.Value)).ToList(),

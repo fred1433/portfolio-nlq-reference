@@ -105,6 +105,7 @@ CREATE TABLE dbo.block_order (
     trade_date     date          NOT NULL,
     created_at     datetime2(0)  NOT NULL,
     status         nvarchar(30)  NOT NULL,
+    time_in_force  varchar(3)    NOT NULL CHECK (time_in_force IN ('DAY', 'GTC')),
     UNIQUE (tenant_id, block_id)
 );
 
@@ -134,6 +135,7 @@ CREATE TABLE dbo.execution (
 );
 
 -- Trade date and settlement date are both kept; positions can be read on either basis.
+-- US securities settle T+1, euro-area securities T+2. All timestamps are America/Chicago.
 CREATE TABLE dbo.txn (
     transaction_id int           NOT NULL PRIMARY KEY,
     tenant_id      int           NOT NULL,

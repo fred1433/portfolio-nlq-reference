@@ -17,7 +17,8 @@ public static class QueryCatalog
                   "Target = the account model's weight for the sleeve, multiplied down the model hierarchy. Drift = weight minus target, in percentage points. " +
                   "An account with any position lacking a close price or an FX rate on the as-of date is reported as incomplete, never valued at zero.",
         [OpenAllocations] = "Per allocation of a block order: allocated quantity, executed quantity (sum of fills up to the as-of time), cancelled quantity, " +
-                            "remaining = allocated - executed - cancelled. Open means remaining above zero. Quantities in shares or units; no prices involved.",
+                            "remaining = allocated - executed - cancelled. Open means remaining above zero. Quantities in shares or units; no prices involved. " +
+                            "Blocks are good-till-cancelled unless marked DAY, so a GTC allocation can still be working the next morning. Timestamps are America/Chicago.",
     };
 
     public static readonly string[] DriftGroupBy = ["account", "household"];

@@ -25,9 +25,9 @@ verify: build
 ## SQL Server in Docker (Linux x86-64): security tests under the restricted login, then the recorded run replayed through the real .NET path.
 sql: build .env
 	set -a; source .env; set +a; \
-	NLQ_SQL_PORT=$(PORT) docker compose up -d --wait; \
-	export NLQ_ADMIN_CONNECTION="Server=localhost,$(PORT);User ID=sa;Password=$$MSSQL_SA_PASSWORD;TrustServerCertificate=True;Encrypt=True"; \
-	export NLQ_READER_CONNECTION="Server=localhost,$(PORT);Database=NlqReference;User ID=nlq_reader;Password=$$NLQ_READER_PASSWORD;TrustServerCertificate=True;Encrypt=True"; \
+	NLQ_SQL_PORT=$(PORT) docker compose up -d --wait && \
+	export NLQ_ADMIN_CONNECTION="Server=localhost,$(PORT);User ID=sa;Password=$$MSSQL_SA_PASSWORD;TrustServerCertificate=True;Encrypt=True" && \
+	export NLQ_READER_CONNECTION="Server=localhost,$(PORT);Database=NlqReference;User ID=nlq_reader;Password=$$NLQ_READER_PASSWORD;TrustServerCertificate=True;Encrypt=True" && \
 	$(NLQ) db-setup && \
 	$(DOTNET) test tests/PortfolioNlq.SqlTests --no-build -nologo --logger "console;verbosity=normal" && \
 	$(NLQ) replay --recording $(PUBLISHED_RECORDING) --run-id $(RUN_ID) --out runs/local-latest --sql && \

@@ -76,8 +76,8 @@ ALTER ROLE nlq_reporting ADD MEMBER [{readerLogin}];
             f.Accounts.Select(a => new object?[] { a.AccountId, a.TenantId, a.AccountNumber, a.Name, a.AccountType, a.HouseholdId, a.CustodianId, a.ModelId, a.BaseCurrency }));
         await Bulk(conn, "dbo.opening_position", ["tenant_id", "account_id", "security_id", "quantity", "as_of"],
             f.OpeningPositions.Select(p => new object?[] { f.TenantOfAccount(p.AccountId), p.AccountId, p.SecurityId, p.Quantity, p.AsOf.ToDateTime(TimeOnly.MinValue) }));
-        await Bulk(conn, "dbo.block_order", ["block_id", "tenant_id", "security_id", "side", "order_quantity", "trade_date", "created_at", "status"],
-            f.BlockOrders.Select(b => new object?[] { b.BlockId, b.TenantId, b.SecurityId, b.Side, b.OrderQuantity, b.TradeDate.ToDateTime(TimeOnly.MinValue), b.CreatedAt, b.Status }));
+        await Bulk(conn, "dbo.block_order", ["block_id", "tenant_id", "security_id", "side", "order_quantity", "trade_date", "created_at", "status", "time_in_force"],
+            f.BlockOrders.Select(b => new object?[] { b.BlockId, b.TenantId, b.SecurityId, b.Side, b.OrderQuantity, b.TradeDate.ToDateTime(TimeOnly.MinValue), b.CreatedAt, b.Status, b.TimeInForce }));
         await Bulk(conn, "dbo.allocation", ["allocation_id", "tenant_id", "block_id", "account_id", "allocated_quantity", "cancelled_quantity", "cancelled_at"],
             f.Allocations.Select(a => new object?[] { a.AllocationId, f.TenantOfBlock(a.BlockId), a.BlockId, a.AccountId, a.AllocatedQuantity, a.CancelledQuantity, a.CancelledAt }));
         await Bulk(conn, "dbo.execution", ["execution_id", "tenant_id", "allocation_id", "quantity", "price", "executed_at"],

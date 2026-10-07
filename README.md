@@ -9,7 +9,7 @@
 | Command | Needs | What it proves |
 |---|---|---|
 | `make verify` | .NET 10 SDK. No Docker, no database, no key. | Fixture hash, expected results recomputed independently, every recorded model reply parsed, validated and compiled to the exact SQL and parameters of the published run, stored rows re-graded, 38 unit tests. Prints what it did **not** execute: SQL Server, row-level security, write denial. |
-| `make sql` | .NET 10 SDK, Docker, **Linux x86-64**. ARM is not supported. | SQL Server 2022 (image pinned by digest), 13 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
+| `make sql` | .NET 10 SDK, Docker. CI runs it on Linux x86-64; on Apple Silicon it works with the x86-64 image under emulation, outside CI. | SQL Server 2022 (image pinned by digest), 13 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
 | `make record` | Claude Code logged in. | Re-records the model replies with `claude -p` on a subscription. Never run by tests or CI. |
 | `nlq ask` | Azure OpenAI endpoint, deployment, key or Entra ID. | A fresh call through `Microsoft.Extensions.AI`. Explicit only. Status: **compiled, not run against the provider.** |
 

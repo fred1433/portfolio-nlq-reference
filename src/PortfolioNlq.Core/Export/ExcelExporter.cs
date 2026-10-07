@@ -32,7 +32,9 @@ public static class ExcelExporter
         var ws = wb.AddWorksheet("Result");
         Text(ws.Cell(1, 1), t.Question); ws.Cell(1, 1).Style.Font.Bold = true;
         var q = t.Interpretation;
-        Text(ws.Cell(2, 1), q?.AsOf is { } d ? $"As of the {d:yyyy-MM-dd} close, {q.DateBasis}-date positions, USD" : $"Order book as at {q?.AsOfTime:yyyy-MM-dd HH:mm} {t.TimeZone}");
+        Text(ws.Cell(2, 1), q is null ? "Not answered" : q.Measure == "drift"
+            ? $"As of the {q.AsOf:yyyy-MM-dd} close, {q.DateBasis}-date positions, USD"
+            : $"Order book as at {q.AsOfTime:yyyy-MM-dd HH:mm} {(string.IsNullOrEmpty(t.TimeZone) ? "America/Chicago" : t.TimeZone)}, quantities in units");
         Text(ws.Cell(3, 1), $"Recorded run {t.RunId}, synthetic data, fixture {t.Fixture.Id}. Status: {t.ExecutionStatus}.");
         WriteTable(ws, 5, t.Columns, t.Rows);
         ws.Columns().AdjustToContents(5, 60);
@@ -86,7 +88,8 @@ public static class ExcelExporter
                 if (format != "@" && decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out var number))
                 {
                     cell.Value = number;
-                    cell.Style.NumberFormat.Format = format;
+                    // share and unit counts are whole numbers; only cash balances carry cents
+                    cell.Style.NumberFormat.Format = cols[c] == "quantity" && number == decimal.Truncate(number) ? "#,##0" : format;
                 }
                 else Text(cell, raw);
             }

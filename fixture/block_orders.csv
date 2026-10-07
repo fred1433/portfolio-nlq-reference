@@ -1,8 +1,8 @@
-block_id,tenant_id,security_id,side,order_quantity,trade_date,created_at,status
-900,1,4,Buy,300,2026-10-01,2026-10-01T09:40:00,Filled
-901,1,1,Sell,1200,2026-10-06,2026-10-06T09:31:00,Partially filled
-902,1,4,Sell,400,2026-10-06,2026-10-06T09:33:00,Partially filled
-903,1,6,Buy,900,2026-10-06,2026-10-06T09:35:00,Filled
-904,1,1,Buy,150,2026-10-06,2026-10-06T15:20:00,Filled
-905,2,1,Sell,1000,2026-10-06,2026-10-06T09:45:00,Partially filled
-906,2,5,Sell,800,2026-10-06,2026-10-06T09:50:00,Partially filled
+block_id,tenant_id,security_id,side,order_quantity,trade_date,created_at,status,time_in_force
+900,1,4,Buy,300,2026-10-01,2026-10-01T09:40:00,Filled,DAY
+901,1,1,Sell,1200,2026-10-06,2026-10-06T09:31:00,Partially filled,GTC
+902,1,4,Sell,400,2026-10-06,2026-10-06T09:33:00,Partially filled,GTC
+903,1,6,Buy,900,2026-10-06,2026-10-06T09:35:00,Filled,DAY
+904,1,1,Buy,150,2026-10-06,2026-10-06T14:20:00,Filled,DAY
+905,2,1,Sell,1000,2026-10-06,2026-10-06T09:45:00,Partially filled,GTC
+906,2,5,Sell,800,2026-10-06,2026-10-06T07:50:00,Partially filled,GTC

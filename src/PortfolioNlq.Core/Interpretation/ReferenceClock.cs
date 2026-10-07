@@ -8,7 +8,10 @@ namespace PortfolioNlq.Interpretation;
 /// </summary>
 public sealed record ReferenceClock(DateTimeOffset Now, string TimeZone)
 {
-    public DateOnly Today => DateOnly.FromDateTime(Now.DateTime);
+    /// <summary>The reference instant read in the business time zone. Dates are taken from this, never from the offset the clock was written with.</summary>
+    public DateTime LocalNow => TimeZoneInfo.ConvertTime(Now, TimeZoneInfo.FindSystemTimeZoneById(TimeZone)).DateTime;
+
+    public DateOnly Today => DateOnly.FromDateTime(LocalNow);
 
     public static ReferenceClock Parse(string iso, string timeZone) =>
         new(DateTimeOffset.Parse(iso, CultureInfo.InvariantCulture), timeZone);

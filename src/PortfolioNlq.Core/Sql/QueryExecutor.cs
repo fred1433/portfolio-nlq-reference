@@ -46,7 +46,11 @@ public sealed class ScopedQueryExecutor(string connectionString, ExecutorOptions
             var (cols, rows, truncated) = await RunAsync(conn, query.Sql, query.Parameters, ct);
             IReadOnlyList<Dictionary<string, string?>> detail = [];
             if (query.DetailSql is not null && !truncated)
-                (_, detail, _) = await RunAsync(conn, query.DetailSql, query.Parameters, ct);
+            {
+                (_, var lines, var linesTruncated) = await RunAsync(conn, query.DetailSql, query.Parameters, ct);
+                detail = lines;
+                truncated |= linesTruncated; // a cut anywhere means the answer is not complete
+            }
             return new(truncated ? "truncated" : "complete", cols, rows, detail, null, sw.ElapsedMilliseconds);
         }
         catch (SqlException e) when (e.Number == -2)

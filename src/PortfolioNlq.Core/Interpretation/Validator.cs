@@ -49,7 +49,7 @@ public static class Validator
             default: return ValidationOutcome.Reject($"unknown kind '{o.Kind}'");
         }
 
-        var defaults = new List<string> { $"reporting currency {QueryCatalog.Defaults.ReportingCurrency}", $"time zone {QueryCatalog.Defaults.TimeZone}" };
+        var defaults = new List<string> { $"reporting currency {QueryCatalog.Defaults.ReportingCurrency}", $"dates and timestamps in {QueryCatalog.Defaults.TimeZone}" };
         return o.Measure switch
         {
             QueryCatalog.Drift => Drift(o, dir, clock, defaults),
@@ -117,14 +117,16 @@ public static class Validator
         DateOnly? asOf = null; DateTime asOfTime;
         if (o.AsOf is null)
         {
-            asOfTime = clock.Now.DateTime;
-            defaults.Add($"order book as at the reference time {clock.Now:yyyy-MM-dd HH:mm} {clock.TimeZone}");
+            asOfTime = clock.LocalNow;
+            defaults.Add($"order book as at the reference time {clock.LocalNow:yyyy-MM-dd HH:mm} {clock.TimeZone}");
         }
         else
         {
             var (d, problem) = ResolveCalendarDate(o.AsOf, clock, dir.CloseDates);
             if (problem is not null) return ValidationOutcome.Ask(problem);
-            asOf = d; asOfTime = d!.Value.ToDateTime(new TimeOnly(23, 59, 59));
+            asOf = d;
+            var endOfDay = d!.Value.ToDateTime(new TimeOnly(23, 59, 59));
+            asOfTime = endOfDay < clock.LocalNow ? endOfDay : clock.LocalNow; // a day not over yet is read up to the reference time
         }
 
         var (filters, filterOutcome) = ResolveFilters(o.Filters, QueryCatalog.AllocationFilters, dir);
