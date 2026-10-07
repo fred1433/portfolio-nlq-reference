@@ -1,0 +1,18 @@
+{
+  "case_id": "B01",
+  "question": "Which equity sell allocations for the Whitfield Family Trust are still unfilled? Break it down by security and custodian.",
+  "user_message": "Question: Which equity sell allocations for the Whitfield Family Trust are still unfilled? Break it down by security and custodian.",
+  "attempts": [
+    {
+      "n": 1,
+      "started_at": "2026-10-07T13:52:35Z",
+      "duration_ms": 4644,
+      "exit_code": 0,
+      "stdout": "{\"duration_api_ms\":3066,\"stop_reason\":\"end_turn\",\"session_id\":\"60337bcd-5de2-4389-bc6c-40b607e8e48b\",\"total_cost_usd\":0.004654800000000001,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":583,\"cache_read_input_tokens\":1144,\"output_tokens\":209,\"output_tokens_details\":{\"thinking_tokens\":127},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":583,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":209,\"cache_read_input_tokens\":1144,\"cache_creation_input_tokens\":583,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":583},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-sonnet-5-5\":{\"inputTokens\":2,\"outputTokens\":209,\"cacheReadInputTokens\":1144,\"cacheCreationInputTokens\":583,\"webSearchRequests\":0,\"costUSD\":0.004654800000000001,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":127,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"safety_stops\":0,\"is_error\":false,\"num_turns\":1,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"kind\\\":\\\"query\\\",\\\"measure\\\":\\\"open_allocations\\\",\\\"side\\\":\\\"sell\\\",\\\"asset_class\\\":\\\"Equity\\\",\\\"status\\\":\\\"open\\\",\\\"group_by\\\":[\\\"security\\\",\\\"custodian\\\"],\\\"filters\\\":[{\\\"field\\\":\\\"account\\\",\\\"value\\\":\\\"Whitfield Family Trust\\\"}]}\",\"ttft_ms\":2496,\"type\":\"result\",\"duration_ms\":3097,\"uuid\":\"67c7f43b-ced8-4ab7-aaa9-3c5931f713c5\",\"ttft_stream_ms\":1443,\"time_to_request_ms\":31,\"first_content_frame_ms\":1443,\"queued_turn_count\":0,\"result_index\":0}\n",
+      "stderr": "",
+      "model_id": "claude-sonnet-5-5",
+      "result_text": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"side\":\"sell\",\"asset_class\":\"Equity\",\"status\":\"open\",\"group_by\":[\"security\",\"custodian\"],\"filters\":[{\"field\":\"account\",\"value\":\"Whitfield Family Trust\"}]}"
+    }
+  ],
+  "attempt_used": 1
+}

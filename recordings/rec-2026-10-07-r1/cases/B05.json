@@ -1,0 +1,18 @@
+{
+  "case_id": "B05",
+  "question": "On the USLC sell block, how much is still unfilled for each fund?",
+  "user_message": "Question: On the USLC sell block, how much is still unfilled for each fund?",
+  "attempts": [
+    {
+      "n": 1,
+      "started_at": "2026-10-07T13:52:52Z",
+      "duration_ms": 3614,
+      "exit_code": 0,
+      "stdout": "{\"duration_api_ms\":1806,\"stop_reason\":\"end_turn\",\"session_id\":\"e9b42589-1ad3-4f07-af1d-33692aa66680\",\"total_cost_usd\":0.0037168,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":566,\"cache_read_input_tokens\":1144,\"output_tokens\":122,\"output_tokens_details\":{\"thinking_tokens\":61},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":566,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":122,\"cache_read_input_tokens\":1144,\"cache_creation_input_tokens\":566,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":566},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-sonnet-5-5\":{\"inputTokens\":2,\"outputTokens\":122,\"cacheReadInputTokens\":1144,\"cacheCreationInputTokens\":566,\"webSearchRequests\":0,\"costUSD\":0.0037168,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":61,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"safety_stops\":0,\"is_error\":false,\"num_turns\":1,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"kind\\\":\\\"query\\\",\\\"measure\\\":\\\"open_allocations\\\",\\\"side\\\":\\\"sell\\\",\\\"status\\\":\\\"open\\\",\\\"group_by\\\":[\\\"account\\\"],\\\"filters\\\":[{\\\"field\\\":\\\"security\\\",\\\"value\\\":\\\"USLC\\\"}]}\",\"ttft_ms\":1376,\"type\":\"result\",\"duration_ms\":1850,\"uuid\":\"8acf732d-1e32-42ff-a38e-4e95c10a7e53\",\"ttft_stream_ms\":797,\"time_to_request_ms\":41,\"first_content_frame_ms\":797,\"queued_turn_count\":0,\"result_index\":0}\n",
+      "stderr": "",
+      "model_id": "claude-sonnet-5-5",
+      "result_text": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"side\":\"sell\",\"status\":\"open\",\"group_by\":[\"account\"],\"filters\":[{\"field\":\"security\",\"value\":\"USLC\"}]}"
+    }
+  ],
+  "attempt_used": 1
+}

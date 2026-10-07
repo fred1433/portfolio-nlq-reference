@@ -1,0 +1,191 @@
+{
+  "run_id": "run-2026-10-07-r1-local",
+  "case_id": "B04",
+  "question": "Which sell allocations for the Halyard Creek Offshore fund are still open?",
+  "outcome": "answered",
+  "outcome_message": null,
+  "outcome_source": "validator",
+  "tenant_id": 2,
+  "user_id": "demo-user-tenant-2",
+  "scope": "tenant 2, set by the host from the authenticated user, pinned read-only in SESSION_CONTEXT",
+  "reference_clock": "2026-10-07T09:00:00-05:00",
+  "time_zone": "America/Chicago",
+  "model": {
+    "provider": "claude-cli",
+    "mode": "recorded",
+    "model_id": "claude-sonnet-5-5",
+    "recording_id": "rec-2026-10-07-r1",
+    "attempts_made": 1,
+    "attempt_used": 1,
+    "recorded_at": "2026-10-07T13:52:48Z",
+    "model_duration_ms": 3872,
+    "flags": [
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "sonnet",
+      "--system-prompt",
+      "<system_prompt.txt>",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--setting-sources",
+      "",
+      "--disable-slash-commands",
+      "--no-session-persistence"
+    ],
+    "prompt_version": "prompt-v1",
+    "prompt_sha256": "4916b6037a735dbb3e20fd64de661c3bc55cb0ba059cbe8a2d360deac6bbd72b",
+    "user_message": "Question: Which sell allocations for the Halyard Creek Offshore fund are still open?",
+    "raw_response": "{\"kind\":\"query\",\"measure\":\"open_allocations\",\"side\":\"sell\",\"status\":\"open\",\"filters\":[{\"field\":\"account\",\"value\":\"Halyard Creek Offshore\"}]}"
+  },
+  "typed_query": {
+    "kind": "query",
+    "measure": "open_allocations",
+    "dimension": null,
+    "threshold": null,
+    "group_by": null,
+    "date_basis": null,
+    "as_of": null,
+    "side": "sell",
+    "asset_class": null,
+    "status": "open",
+    "filters": [
+      {
+        "field": "account",
+        "value": "Halyard Creek Offshore"
+      }
+    ],
+    "message": null
+  },
+  "parse_error": null,
+  "interpretation": {
+    "measure": "open_allocations",
+    "dimension_type": null,
+    "dimension_value": null,
+    "threshold_direction": null,
+    "threshold_points": null,
+    "group_by": [
+      "account",
+      "security",
+      "custodian"
+    ],
+    "date_basis": "n/a",
+    "as_of": null,
+    "as_of_time": "2026-10-07T09:00:00",
+    "side": "Sell",
+    "asset_class": null,
+    "status": "open",
+    "filters": [
+      {
+        "field": "account",
+        "input": "Halyard Creek Offshore",
+        "ids": [
+          202
+        ],
+        "matched": [
+          "Halyard Creek Offshore Ltd (HCC-2002)"
+        ]
+      }
+    ],
+    "defaults_applied": [
+      "reporting currency USD",
+      "time zone America/Chicago",
+      "one row per account, security and custodian",
+      "order book as at the reference time 2026-10-07 09:00 America/Chicago"
+    ],
+    "definition": "Per allocation of a block order: allocated quantity, executed quantity (sum of fills up to the as-of time), cancelled quantity, remaining = allocated - executed - cancelled. Open means remaining above zero. Quantities in shares or units; no prices involved."
+  },
+  "directory_source": "sql: rpt views under SESSION_CONTEXT tenant 2",
+  "versions": {
+    "catalog": "catalog-2026.10.1",
+    "compiler": "compiler-2026.10.1",
+    "schema": "schema-e8a3fe80c712",
+    "prompt": "prompt-v1 sha256 4916b6037a73",
+    "app": "PortfolioNlq 1.0.0"
+  },
+  "fixture": {
+    "id": "synthetic-2026-10-06-9cf1bbc394e9",
+    "sha256": "9cf1bbc394e975239f14a15bbca62189bb98c2a2d01da7876e2a5336d0e5aae0"
+  },
+  "sql": "WITH ex AS (\n    SELECT e.allocation_id, SUM(e.quantity) AS executed_qty\n    FROM rpt.v_executions AS e\n    WHERE e.executed_at <= @as_of_time\n    GROUP BY e.allocation_id\n), lines AS (\n    SELECT l.allocation_id, l.block_id, l.side, l.symbol, l.security_name, l.account_number, l.account_name, l.custodian,\n           l.allocated_quantity,\n           COALESCE(ex.executed_qty, 0) AS executed_qty,\n           CASE WHEN l.cancelled_at <= @as_of_time THEN l.cancelled_quantity ELSE 0 END AS cancelled_qty\n    FROM rpt.v_allocation_lines AS l\n    LEFT JOIN ex ON ex.allocation_id = l.allocation_id\n    WHERE l.created_at <= @as_of_time\n      AND l.side = @side\n      AND l.account_id IN (@account_0)\n), scored AS (\n    SELECT lines.*,\n           allocated_quantity - executed_qty - cancelled_qty AS remaining_qty,\n           CASE WHEN allocated_quantity - executed_qty - cancelled_qty > 0\n                THEN CASE WHEN executed_qty > 0 THEN N'Partially filled' ELSE N'Working' END\n                WHEN cancelled_qty > 0 THEN N'Remainder cancelled'\n                ELSE N'Filled' END AS line_status\n    FROM lines\n)\nSELECT account_number, account_name, symbol, security_name, custodian,\n       SUM(allocated_quantity) AS allocated_qty,\n       SUM(executed_qty) AS executed_qty,\n       SUM(cancelled_qty) AS cancelled_qty,\n       SUM(remaining_qty) AS remaining_qty,\n       CASE WHEN MIN(line_status) = MAX(line_status) THEN MIN(line_status) ELSE N'Mixed' END AS order_status,\n       COUNT(*) AS allocation_count\nFROM scored\nWHERE remaining_qty > 0\nGROUP BY account_number, account_name, symbol, security_name, custodian\nORDER BY account_number, account_name, symbol, security_name, custodian;",
+  "detail_sql": null,
+  "parameters": [
+    {
+      "name": "@as_of_time",
+      "sql_type": "datetime2(0)",
+      "value": "2026-10-07T09:00:00"
+    },
+    {
+      "name": "@side",
+      "sql_type": "varchar(4)",
+      "value": "Sell"
+    },
+    {
+      "name": "@account_0",
+      "sql_type": "int",
+      "value": "202"
+    }
+  ],
+  "key_columns": [
+    "account_number",
+    "symbol",
+    "custodian"
+  ],
+  "execution_status": "complete",
+  "execution_note": "2 row(s), complete.",
+  "columns": [
+    "account_number",
+    "account_name",
+    "symbol",
+    "security_name",
+    "custodian",
+    "allocated_qty",
+    "executed_qty",
+    "cancelled_qty",
+    "remaining_qty",
+    "order_status",
+    "allocation_count"
+  ],
+  "rows": [
+    {
+      "account_number": "HCC-2002",
+      "account_name": "Halyard Creek Offshore Ltd",
+      "symbol": "NRDB",
+      "security_name": "Nordvik Bank ASA",
+      "custodian": "Northern Trust",
+      "allocated_qty": "500",
+      "executed_qty": "0",
+      "cancelled_qty": "0",
+      "remaining_qty": "500",
+      "order_status": "Working",
+      "allocation_count": "1"
+    },
+    {
+      "account_number": "HCC-2002",
+      "account_name": "Halyard Creek Offshore Ltd",
+      "symbol": "USLC",
+      "security_name": "US Large Cap Equity ETF",
+      "custodian": "Northern Trust",
+      "allocated_qty": "400",
+      "executed_qty": "250",
+      "cancelled_qty": "0",
+      "remaining_qty": "150",
+      "order_status": "Partially filled",
+      "allocation_count": "1"
+    }
+  ],
+  "detail_rows": [],
+  "durations_ms": {
+    "model": 3872,
+    "parse": 0,
+    "validate": 31,
+    "compile": 0,
+    "execute": 42
+  },
+  "executed_at": "2026-10-07T13:54:10Z",
+  "executed_on": "macOS 27.0.1 Arm64, .NET 10.0.12, SQL Server 16.0.4295.3 Developer Edition (64-bit)"
+}

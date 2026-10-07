@@ -97,7 +97,7 @@ public static class Commands
     {
         await using var c = new SqlConnection(conn);
         await c.OpenAsync();
-        await using var cmd = new SqlCommand("SELECT CONCAT('SQL Server ', SERVERPROPERTY('ProductVersion'), ' ', SERVERPROPERTY('Edition'))", c);
+        await using var cmd = new SqlCommand("SELECT CONCAT('SQL Server ', CAST(SERVERPROPERTY('ProductVersion') AS nvarchar(40)), ' ', CAST(SERVERPROPERTY('Edition') AS nvarchar(80)))", c);
         return (string)(await cmd.ExecuteScalarAsync())!;
     }
 
