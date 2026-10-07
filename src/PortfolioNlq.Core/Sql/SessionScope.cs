@@ -13,12 +13,14 @@ public sealed class ScopeException(string message, Exception? inner = null) : Ex
 /// </summary>
 public static class SessionScope
 {
-    public static async Task<SqlConnection> OpenAsync(string connectionString, ScopeIdentity scope, CancellationToken ct)
+    public static async Task<SqlConnection> OpenAsync(string connectionString, ScopeIdentity scope, CancellationToken ct,
+        Func<SqlConnection, CancellationToken, Task>? afterOpen = null)
     {
         var conn = new SqlConnection(connectionString);
         try
         {
             await conn.OpenAsync(ct);
+            if (afterOpen is not null) await afterOpen(conn, ct); // test seam: simulates a cancellation between open and scope setup
             await using (var set = new SqlCommand(
                 "EXEC sys.sp_set_session_context @key = N'tenant_id', @value = @tenant, @read_only = 1; " +
                 "EXEC sys.sp_set_session_context @key = N'user_id', @value = @user, @read_only = 1;", conn))

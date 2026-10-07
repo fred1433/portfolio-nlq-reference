@@ -101,6 +101,14 @@ public static class Commands
         return (string)(await cmd.ExecuteScalarAsync())!;
     }
 
+    /// <summary>Grades one trace against its case and its independent expectation.</summary>
+    public static Grade GradeOne(string caseId, AnswerTrace t, FixtureSet f)
+    {
+        var c = EvalFile.Load(Repo.CasesFile).Cases.Single(x => x.Id == caseId);
+        var e = ExpectedFile.Load(Repo.ExpectedFile).Cases.Single(x => x.CaseId == caseId);
+        return Grader.GradeCase(c.Set, e, t, f, c.Spec?.AsOf, c.Spec?.Basis, c.Spec?.Measure);
+    }
+
     public static RunSummary Grade(string runId, string recordingId, string mode, string executedOn, FixtureSet f, EvalFile eval, IReadOnlyList<AnswerTrace> traces)
     {
         var expected = ExpectedFile.Load(Repo.ExpectedFile);
