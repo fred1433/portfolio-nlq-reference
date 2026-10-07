@@ -8,16 +8,16 @@
 
 | Command | Needs | What it proves |
 |---|---|---|
-| `make verify` | .NET 10 SDK. No Docker, no database, no key. | Fixture hash, expected results recomputed independently, every recorded model reply parsed, validated and compiled to the exact SQL and parameters of the published run, stored rows re-graded, 38 unit tests. Prints what it did **not** execute: SQL Server, row-level security, write denial. |
-| `make sql` | .NET 10 SDK, Docker. CI runs it on Linux x86-64; on Apple Silicon it works with the x86-64 image under emulation, outside CI. | SQL Server 2022 (image pinned by digest), 13 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
+| `make verify` | .NET 10 SDK. No Docker, no database, no key. | Fixture hash, expected results recomputed independently, every recorded model reply parsed, validated and compiled to the exact SQL and parameters of the published run, stored rows re-graded, 47 unit tests. Prints what it did **not** execute: SQL Server, row-level security, write denial. |
+| `make sql` | .NET 10 SDK, Docker. CI runs it on Linux x86-64; on Apple Silicon it works with the x86-64 image under emulation, outside CI. | SQL Server 2022 (image pinned by digest), 16 tests under the restricted login, then the published recording replayed through the real .NET path and compared answer by answer with the published run. |
 | `make record` | Claude Code logged in. | Re-records the model replies with `claude -p` on a subscription. Never run by tests or CI. |
 | `nlq ask` | Azure OpenAI endpoint, deployment, key or Entra ID. | A fresh call through `Microsoft.Extensions.AI`. Explicit only. Status: **compiled, not run against the provider.** |
 
-CI runs `make verify` and `make sql` on `ubuntu-24.04` (x86-64) at every push. Open `PortfolioNlq.slnx` in Visual Studio or Rider and debug `PortfolioNlq.Cli` with `replay --recording recordings/rec-2026-10-07-r2 --run-id debug --out runs/local-debug`.
+CI runs `make verify` and `make sql` on `ubuntu-24.04` (x86-64) at every push. Open `PortfolioNlq.slnx` in Visual Studio or Rider and debug `PortfolioNlq.Cli` with `replay --recording recordings/rec-2026-10-07-r3 --run-id debug --out runs/local-debug`.
 
 ## Published results
 
-Run `ci-2-x86-64` (GitHub Actions), recording `rec-2026-10-07-r2` (prompt-v2, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-9cf1bbc394e9`, SQL Server 2022 on Linux x86-64. 28 questions, graded against results computed beforehand by separate code. No single score:
+Run `ci-4-x86-64` (GitHub Actions), recording `rec-2026-10-07-r3` (prompt-v2, `claude-sonnet-5-5`), fixture `synthetic-2026-10-06-ab02a59d4fd2`, SQL Server 2022 on Linux x86-64. 28 questions, graded against results computed beforehand by separate code. No single score:
 
 | Category | Result |
 |---|---|
@@ -26,9 +26,11 @@ Run `ci-2-x86-64` (GitHub Actions), recording `rec-2026-10-07-r2` (prompt-v2, `c
 | Refusals | 4 of 4 refused |
 | Authorization and adversarial | 5 of 5 held, 0 rows from another tenant |
 
-Every case lists its checks (measure, as-of date, date basis, row identity, completeness, values) in `runs/ci-2-x86-64/summary.json`. One recording per prompt version: sampling variance was not measured. 28 cases is a reference, not a benchmark.
+Every case lists its checks (measure, as-of date, date basis, row identity, completeness, values) in `runs/ci-4-x86-64/summary.json`. One recording per prompt version: sampling variance was not measured. 28 cases is a reference, not a benchmark.
 
 **The loop that produced this.** Run 1 (`runs/run-2026-10-07-r1-local`, kept as recorded) failed 10 of 28: all 9 drift questions hit a SQL Server error in the compiled query (`Cannot perform an aggregate function on an expression containing an aggregate or a subquery`), and each answer said the query failed rather than showing an empty list; X02 was refused by the model instead of answered for the asking firm. Fixes: the dimension is now joined instead of tested with a subquery inside `SUM` (`compiler-2026.10.2`, guarded by a unit test), and prompt-v2 stops treating a mention of other firms as a reason to refuse. X02 is now a regression case; X05, a holdout whose run 1 output was read while writing the fix, is requalified as regression too. A named, injected defect (`>=` instead of `>` on the threshold) is also kept as a test: the evaluation flags Okafor Roth IRA, which sits at exactly +2.00.
+
+**Fixture correction, same day.** A review found the euro security named and settled like a Norwegian one, fills stamped after the US close, and a clock read without its time zone. The fixture was corrected (a euro-area issuer settling T+2, America/Chicago session times, a time in force on every block), the clock now converts to America/Chicago before taking a date, and `eval/expected.json` was recomputed and committed **before** the new model calls (recording r3, prompt unchanged). Runs 1 and 2 stay in `runs/` on the previous fixture. Each fix has a test that failed before it (`ReviewFixesTests`, `ReviewFixesSqlTests`).
 
 ## How a question becomes SQL
 
@@ -53,7 +55,7 @@ The catalog is composable: drift takes an asset class or a tag, account or house
 
 Each answer writes `runs/<run>/traces/<case>.json`: question; typed query and resolved interpretation; effective scope; prompt version and hash, user message, raw model reply, model id, recording id and CLI flags; catalog, compiler and schema versions; SQL and typed parameters; fixture id and SHA-256; as-of date, basis and reference clock; rows exactly as returned, contributing lines; status (complete, truncated, timeout, cancelled, error); real durations. `nlq export --trace <file> --out answer.xlsx` writes a workbook from that stored trace without running anything again: a Result sheet with typed numbers and units, the contributing lines, and an Audit sheet. Text that a spreadsheet could read as a formula is written as text with a quote prefix.
 
-The fixture is frozen and hashed (`fixture/*.csv`) instead of using temporal tables. Reconstructing history in production (temporal tables, snapshots, or the application's own books of record) is an integration question.
+The fixture is frozen and hashed (`fixture/*.csv`) instead of using temporal tables. Timestamps are America/Chicago; US securities settle T+1 and the euro-area security T+2; blocks carry a time in force (DAY or GTC). Reconstructing history in production (temporal tables, snapshots, or the application's own books of record) is an integration question.
 
 ## Database boundary
 
